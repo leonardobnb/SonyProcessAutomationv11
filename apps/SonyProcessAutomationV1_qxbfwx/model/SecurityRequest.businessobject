@@ -1,0 +1,55 @@
+{
+  "id": 1,
+  "name": "SecurityRequest",
+  "label": "Security Request",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "securityRequests",
+    "label": "Security Requests"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "securityRequestID",
+      "label": "Security Request ID",
+      "type": "TEXT",
+      "isReferenceId": true
+    },
+    {
+      "id": 2,
+      "name": "mirrorWorker",
+      "label": "Mirror Worker",
+      "type": "SINGLE_INSTANCE",
+      "target": "WORKER"
+    },
+    {
+      "id": 3,
+      "name": "mirrorPosition",
+      "label": "Mirror Position",
+      "type": "SINGLE_INSTANCE",
+      "target": "POSITION"
+    },
+    {
+      "id": 4,
+      "name": "effectiveDate",
+      "label": "Effective Date",
+      "type": "DATE",
+      "precision": "HOUR"
+    },
+    {
+      "id": 5,
+      "name": "effectiveUntil",
+      "label": "Effective Until",
+      "type": "DATE",
+      "precision": "HOUR"
+    },
+    {
+      "id": 6,
+      "name": "justificationText",
+      "label": "Justification",
+      "type": "TEXT"
+    }
+  ]
+}

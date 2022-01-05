@@ -1,0 +1,35 @@
+{
+  "id": 4,
+  "name": "SRTarget",
+  "label": "SR Target",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "sRTargets",
+    "label": "SR Targets"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "securityRequestID",
+      "label": "Security Request ID",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequest"
+    },
+    {
+      "id": 2,
+      "name": "targetWorker",
+      "label": "Target Worker",
+      "type": "SINGLE_INSTANCE",
+      "target": "WORKER"
+    },
+    {
+      "id": 3,
+      "name": "targetPosition",
+      "label": "Target Position",
+      "type": "SINGLE_INSTANCE",
+      "target": "POSITION"
+    }
+  ]
+}

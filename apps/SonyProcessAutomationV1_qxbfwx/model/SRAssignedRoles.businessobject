@@ -1,0 +1,33 @@
+{
+  "id": 2,
+  "name": "SRAssignedRoles",
+  "label": "SR Assigned Roles",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "sRAssignedRoles",
+    "label": "SR Assigned Roles"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "securityRequestID",
+      "label": "Security Request ID",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequest"
+    },
+    {
+      "id": 2,
+      "name": "assignableRole",
+      "label": "Assignable Role",
+      "type": "TEXT"
+    },
+    {
+      "id": 3,
+      "name": "organizationID",
+      "label": "Organization ID",
+      "type": "TEXT"
+    }
+  ]
+}

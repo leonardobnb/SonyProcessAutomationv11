@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <map>
+        <entry key="amd.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="amd.schema" />
+              <option name="relativePathToSchema" value="schemas/amd.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.amd" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="attachment.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="attachment.schema" />
+              <option name="relativePathToSchema" value="schemas/attachment.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.attachment" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="businessObject.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="businessObject.schema" />
+              <option name="relativePathToSchema" value="schemas/businessObject.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.businessobject" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="businessProcess.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="businessProcess.schema" />
+              <option name="relativePathToSchema" value="schemas/businessProcess.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.businessprocess" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="report.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="report.schema" />
+              <option name="relativePathToSchema" value="schemas/modelReport.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.report" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="securityDomain.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="securityDomain.schema" />
+              <option name="relativePathToSchema" value="schemas/securityDomain.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.securitydomain" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="smd.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="smd.schema" />
+              <option name="relativePathToSchema" value="schemas/smd.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.smd" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+        <entry key="task.schema">
+          <value>
+            <SchemaInfo>
+              <option name="name" value="task.schema" />
+              <option name="relativePathToSchema" value="schemas/modelTask.schema.json" />
+              <option name="patterns">
+                <list>
+                  <Item>
+                    <option name="pattern" value="true" />
+                    <option name="path" value="*.task" />
+                    <option name="mappingKind" value="Pattern" />
+                  </Item>
+                </list>
+              </option>
+            </SchemaInfo>
+          </value>
+        </entry>
+      </map>
+    </state>
+  </component>
+</project>

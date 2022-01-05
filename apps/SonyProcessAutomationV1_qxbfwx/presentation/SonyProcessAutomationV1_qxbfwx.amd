@@ -1,0 +1,13 @@
+{
+  "appProperties": [ ],
+  "tasks": [
+    {
+      "id": "root",
+      "routingPattern": "/",
+      "page": {
+        "id": "home"
+      }
+    }
+  ],
+  "applicationId": "SonyProcessAutomationV1_qxbfwx"
+}

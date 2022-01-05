@@ -1,0 +1,27 @@
+{
+  "id": 3,
+  "name": "SRSecurityGroups",
+  "label": "SR Security Groups",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "sRSecurityGroups",
+    "label": "SR Security Groups"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "securityRequestID",
+      "label": "Security Request ID",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequest"
+    },
+    {
+      "id": 2,
+      "name": "securityGroupID",
+      "label": "Security Group ID",
+      "type": "TEXT"
+    }
+  ]
+}
