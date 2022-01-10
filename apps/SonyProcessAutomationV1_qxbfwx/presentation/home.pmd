@@ -69,6 +69,11 @@
       return false
       }
   };
+
+  var populateAllPositionsInstanceList = function(workerName){
+      var positionsData = getPositions.invoke({'fullName': workerName});
+      var allPositions = positionsData.data[0].positionsForWorker
+  }
              %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
@@ -92,14 +97,30 @@
           "onChange": "<%
           if (!empty workerSearch.value == true){ /* verifica si hay algo selecionado en el Mirror Worker */
               var getNameFromSearch = workerSearch.selectedEntries[0].descriptor /* get el nombre del Worker */
-                  if(moreThanOnePosition(getNameFromSearch) == false){
+                  if(moreThanOnePosition(getNameFromSearch) == false){ /* si solo hay una position */
                       var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor
-                              readOnlyPositionName.setValue(positionName);
-                  } else {
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
+                          var positionId = positionsData.data[0].positionsForWorker[0].id;
 
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                              readOnlyPositionName.setValue(arrayOfIdsPosition);
+                      allPositionsInstanceList.setValues(allPositionsForWorker);
+                      allPositionsInstanceList.setValue(arrayOfIdsPosition);
+                  } else {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                      allPositionsInstanceList.setValues(allPositionsForWorker);
+                          allPositionsInstanceList.setValue(arrayOfIdsPosition);
                   }
           } else {
+              allPositionsInstanceList.setValues([]);
               readOnlyPositionName.setValue('Choose a worker');
           }
 
@@ -112,8 +133,7 @@
           "type": "instanceList",
           "id": "allPositionsInstanceList",
           "label": "Choose a position to mirror",
-          "values": "<% var list = []; %>",
-          "render": false
+          "values": "<% var list = []; %>"
         },
         {
           "type": "readOnlyText",
