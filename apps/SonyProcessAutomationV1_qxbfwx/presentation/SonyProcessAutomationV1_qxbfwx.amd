@@ -1,5 +1,5 @@
 {
-  "appProperties": [ ],
+  "appProperties": [],
   "tasks": [
     {
       "id": "root",
@@ -7,7 +7,20 @@
       "page": {
         "id": "home"
       }
+    },
+    {
+      "id": "SearchForWorker",
+      "routingPattern": "SearchForWorker",
+      "page": {
+        "id": "SearchForWorker"
+      }
     }
   ],
-  "applicationId": "SonyProcessAutomationV1_qxbfwx"
+  "applicationId": "SonyProcessAutomationV1_qxbfwx",
+  "dataProviders": [
+    {
+      "key": "WORKDAY",
+      "value": "https://api.workday.com"
+    }
+  ]
 }

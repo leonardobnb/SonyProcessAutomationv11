@@ -1,0 +1,64 @@
+{
+  "id": "SearchForWorker",
+  "endPoints": [
+    {
+      "name": "workerSearch",
+      "baseUrlType": "WORKDAY",
+      "url": "<%getSearchURL(instanceListQuery)%>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "script": "<%
+
+             var getSearchURL = function(searchTXT)
+{
+                 if(searchTXT.isNumber())
+{
+                     var emplid = searchTXT;
+                         return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT fullName AS descriptor, employeeID as id FROM allWorkers WHERE employeeID = \\'' + emplid + '\\'');
+                 }
+                     else
+{
+                     return   'https://api.workday.com/common/v1/workers?search=' + searchTXT;
+                 }
+             }
+             %>",
+  "presentation": {
+    "headerSize": "STANDARD",
+    "pageType":"edit",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "instanceList",
+          "id": "helloTest",
+          "values": "<% var list = []; %>",
+          "searchEndPoint": "<% endpoints.workerSearch %>",
+          "searchResultValues": "<% workerSearch.data %>"
+        }
+
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Extend"
+        }
+      ]
+    }
+  }
+}
+
+QUERY para pegar a POSITION pro Employee ID:  SELECT position FROM allWorkers WHERE employeeID="21001"
+Query por FullName:   SELECT position FROM allWorkers WHERE fullName="Logan McNeil"
+  Query para pegar as positions: SELECT positionsForWorker FROM allWorkers WHERE fullName="Logan McNeil"
+
+var positionsData = getPositions.invoke({'fullName': getNameFromSearch}) devolve o seguinte
+[{"positionsForWorker":[{"descriptor":"P-00004 Vice President, Human Resources - Logan McNeil", "id":"ae5982654df8420dacc5f530e096215b"}]}]
