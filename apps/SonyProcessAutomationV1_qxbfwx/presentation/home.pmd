@@ -2,13 +2,6 @@
   "id": "home",
   "endPoints":[
     {
-      "_comment": "sacar todos los workers",
-      "name": "workers",
-      "baseUrlType": "WORKDAY",
-      "url": "/common/v1/workers?limit=100",
-      "authType": "sso"
-    },
-    {
       "name": "workerSearch",
       "baseUrlType": "WORKDAY",
       "url": "<%getSearchURL(instanceListQuery)%>",
@@ -31,6 +24,11 @@
       "exclude": "<% empty instanceListQuery %>",
       "authType": "sso",
       "deferred": "true"
+    },
+    {
+      "name": "getAllWorkers",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
+      "authType": "sso"
     }
   ],
   "script": "<%
@@ -60,6 +58,7 @@
              return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
              };
 
+
   var moreThanOnePosition = function(workerName) {
       var positionsData = getPositions.invoke({'fullName': workerName});
       var listSize = positionsData.data[0].positionsForWorker;
@@ -74,6 +73,7 @@
       var positionsData = getPositions.invoke({'fullName': workerName});
       var allPositions = positionsData.data[0].positionsForWorker
   }
+
              %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
@@ -84,13 +84,14 @@
       "enabled": true
     },
     "body": {
-      "type": "section",
+      "type": "fieldSet",
       "horizontal": false,
       "children": [
         {
           "type": "instanceList",
           "id": "workerSearch",
           "label": "Search Worker",
+          "visible": false,
           "values": "<% var list = []; %>",
           "searchEndPoint": "<% endpoints.workerSearch %>",
           "searchResultValues": "<% workerSearch.data %>",
@@ -106,7 +107,6 @@
                           var arrayOfIdsPosition = [];
                           arrayOfIdsPosition.add(allPositionsForWorker[0].id);
 
-                              readOnlyPositionName.setValue(arrayOfIdsPosition);
                       allPositionsInstanceList.setValues(allPositionsForWorker);
                       allPositionsInstanceList.setValue(arrayOfIdsPosition);
                   } else {
@@ -121,7 +121,6 @@
                   }
           } else {
               allPositionsInstanceList.setValues([]);
-              readOnlyPositionName.setValue('Choose a worker');
           }
 
 
@@ -133,42 +132,135 @@
           "type": "instanceList",
           "id": "allPositionsInstanceList",
           "label": "Choose a position to mirror",
+          "visible": false,
           "values": "<% var list = []; %>"
         },
         {
-          "type": "readOnlyText",
-          "id": "readOnlyPositionName",
-          "label": "Position",
-          "value": "Choose a worker"
+          "type": "instanceList",
+          "id": "getAllWorkersInstanceList",
+          "label": "Search a worker to copy the security groups from:",
+          "required": true,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty getAllWorkersInstanceList.value == true) {
+              choosePositionFromInstanceList.visible = true;
+                  effectiveDate.visible = true;
+                  effectiveUntil.visible = true;
+                  justificationText.visible = true;
+                  getAllWorkersToInstanceList.visible = true;
+              var getNameFromSearch = getAllWorkersInstanceList.selectedEntries[0].descriptor
+                       if(moreThanOnePosition(getNameFromSearch) == false) {
+                           var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                               var allPositionsForWorker = positionsData.data[0].positionsForWorker
+                               var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
+                               var positionId = positionsData.data[0].positionsForWorker[0].id;
+
+                               var arrayOfIdsPosition = [];
+                               arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                               choosePositionFromInstanceList.setValues(allPositionsForWorker);
+                               choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
+
+                       } else {
+                           var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                               var allPositionsForWorker = positionsData.data[0].positionsForWorker
+
+                               var arrayOfIdsPosition = [];
+                               arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                               choosePositionFromInstanceList.setValues(allPositionsForWorker);
+                               choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
+                       }
+          } else {
+              choosePositionFromInstanceList.visible = false;
+              effectiveDate.visible = false;
+                  effectiveUntil.visible = false;
+                  justificationText.visible = false;
+                  getAllWorkersToInstanceList.visible = false;
+          } %>"
         },
         {
           "type": "instanceList",
-          "id": "mirrorWorker",
-          "label": "Mirror Worker",
+          "id": "choosePositionFromInstanceList",
+          "label": "Choose a position to mirror the security groups:",
+          "values": "<% var list = []; %>",
           "required": true,
-          "values": "<% workers.data %>"
+          "visible": false
         },
         {
-          "type": "textArea",
-          "id": "testeteste",
-          "value": "<% string:toString(mirrorWorker.selectedEntries) %>"
+          "type": "instanceList",
+          "id": "getAllWorkersToInstanceList",
+          "label": "Choose the target worker:",
+          "required": true,
+          "visible": false,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty getAllWorkersToInstanceList.value == true) {
+              choosePositionToInstanceList.visible = true;
+              var getNameFromSearch = getAllWorkersToInstanceList.selectedEntries[0].descriptor
+                  if(moreThanOnePosition(getNameFromSearch) == false) {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
+                          var positionId = positionsData.data[0].positionsForWorker[0].id;
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionToInstanceList.setValues(allPositionsForWorker);
+                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
+
+                  } else {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionToInstanceList.setValues(allPositionsForWorker);
+                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
+                  }
+          } else {
+              choosePositionToInstanceList.visible = false;
+          } %>"
+        },
+        {
+          "type": "instanceList",
+          "id": "choosePositionToInstanceList",
+          "label": "Choose a position to receive the new security groups:",
+          "values": "<% var list = []; %>",
+          "required": true,
+          "visible": false
         },
         {
           "type": "date",
           "id": "effectiveDate",
           "label": "Effective Date",
-          "required": true
+          "required": true,
+          "visible": false
         },
         {
           "type": "date",
           "id": "effectiveUntil",
           "label": "Effective Until",
-          "required": false
+          "required": false,
+          "visible": false
         },
         {
-          "type": "textArea",
+          "type": "text",
           "id": "justificationText",
-          "label": "Justification Text"
+          "label": "Justification Text",
+          "required": false,
+          "visible": false
+        },
+        {
+          "type": "editButtonBar",
+          "editButtons": [
+            {
+              "type": "editButton",
+              "label": "Submit",
+              "id": "submit",
+              "buttonType": "SECONDARY"
+            }
+          ]
         }
       ]
     },
@@ -178,7 +270,7 @@
         {
           "type": "richText",
           "enabled": "false",
-          "value": "Powered By Workday Extend"
+          "value": "Sony Security Process Automation v1.0"
         }
       ]
     }

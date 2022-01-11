@@ -60,5 +60,20 @@ QUERY para pegar a POSITION pro Employee ID:  SELECT position FROM allWorkers WH
 Query por FullName:   SELECT position FROM allWorkers WHERE fullName="Logan McNeil"
   Query para pegar as positions: SELECT positionsForWorker FROM allWorkers WHERE fullName="Logan McNeil"
 
-var positionsData = getPositions.invoke({'fullName': getNameFromSearch}) devolve o seguinte
-[{"positionsForWorker":[{"descriptor":"P-00004 Vice President, Human Resources - Logan McNeil", "id":"ae5982654df8420dacc5f530e096215b"}]}]
+  dropdown pra tentar pegar todos os workers (porem app nao abre)
+{
+"type": "dropdown",
+"id": "mirrorWorkerDropDown",
+"label": "Mirror Worker",
+"instanceListLoopTag": {
+"id": "mirrorWorkerLoopTag",
+"type": "instanceLoop",
+"on": "<% getAllWorkers.data %>",
+"as": "instance",
+"templateInstance": {
+"id": "<% instance.id %>",
+"descriptor": "<% instance.descriptor %>"
+}
+}
+},
+
