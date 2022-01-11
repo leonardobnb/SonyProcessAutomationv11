@@ -29,7 +29,8 @@
       "name": "mirrorPosition",
       "label": "Mirror Position",
       "type": "SINGLE_INSTANCE",
-      "target": "POSITION"
+      "target": "POSITION",
+      "secureByTarget": true
     },
     {
       "id": 4,

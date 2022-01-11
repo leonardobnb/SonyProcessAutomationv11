@@ -1,0 +1,26 @@
+{
+  "id": 1,
+  "name": "SecurityRequest",
+  "label": "Security Request",
+  "description": "Create a new Security Request",
+  "allowsCancel": true,
+  "targetBusinessObject": "SecurityRequest",
+  "approvalStep": {
+    "actions": [
+      "APPROVE",
+      "DENY",
+      "SEND_BACK"
+    ],
+    "pageRoute": "/home/{eventStepId}"
+  },
+  "revisePageRoute": "/home/{eventStepId}",
+  "actionSteps": [
+    {
+      "id": 1,
+      "name": "ReviewSecurityRequest",
+      "label": "Review My Business Process",
+      "description": "Step to review my business process",
+      "pageRoute": "/home/{eventStepId}"
+    }
+  ]
+}

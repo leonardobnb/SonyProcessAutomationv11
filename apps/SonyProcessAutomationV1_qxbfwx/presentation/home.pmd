@@ -179,12 +179,25 @@
           } %>"
         },
         {
+          "type": "text",
+          "id": "mirrorWorker",
+          "value": "getAllWorkersInstanceList.value",
+          "valueOutBinding": "SecurityRequest.mirrorWorker",
+          "visible": false
+        },
+        {
           "type": "instanceList",
           "id": "choosePositionFromInstanceList",
           "label": "Choose a position to mirror the security groups:",
           "values": "<% var list = []; %>",
           "required": true,
           "visible": false
+        },
+        {
+          "type": "text",
+          "id": "mirrorPosition",
+          "value": "choosePositionFromInstanceList.value",
+          "valueOutBinding": "SecurityRequest.mirrorPosition"
         },
         {
           "type": "instanceList",
@@ -223,6 +236,13 @@
           } %>"
         },
         {
+          "type": "text",
+          "id": "targetWorker",
+          "value": "getAllWorkersToInstanceList.value",
+          "valueOutBinding": "SRTarget.targetWorker",
+          "visible": false
+        },
+        {
           "type": "instanceList",
           "id": "choosePositionToInstanceList",
           "label": "Choose a position to receive the new security groups:",
@@ -231,25 +251,34 @@
           "visible": false
         },
         {
+          "type": "text",
+          "id": "targetPosition",
+          "value": "choosePositionToInstanceList.value",
+          "valueOutBinding": "SRTarget.targetPosition"
+        },
+        {
           "type": "date",
           "id": "effectiveDate",
           "label": "Effective Date",
           "required": true,
-          "visible": false
+          "visible": false,
+          "valueOutBinding": "SecurityRequest.effectiveDate"
         },
         {
           "type": "date",
           "id": "effectiveUntil",
           "label": "Effective Until",
           "required": false,
-          "visible": false
+          "visible": false,
+          "valueOutBinding": "SecurityRequest.effectiveUntil"
         },
         {
           "type": "text",
           "id": "justificationText",
           "label": "Justification Text",
           "required": false,
-          "visible": false
+          "visible": false,
+          "valueOutBinding": "SecurityRequest.justificationText"
         },
         {
           "type": "editButtonBar",
