@@ -1,305 +1,35 @@
 {
   "id": "home",
   "endPoints":[
-    {
-      "name": "workerSearch",
-      "baseUrlType": "WORKDAY",
-      "url": "<%getSearchURL(instanceListQuery)%>",
-      "exclude": "<% empty instanceListQuery %>",
-      "authType": "sso",
-      "deferred": "true"
-    },
-    {
-      "name": "getPositions",
-      "baseUrlType": "WORKDAY",
-      "url": "<% getPositionsQuery(fullName) %>",
-      "exclude": "<% empty instanceListQuery %>",
-      "authType": "sso",
-      "deferred": "true"
-    },
-    {
-      "name": "getPrimaryPosition",
-      "baseUrlType": "WORKDAY",
-      "url": "<% getPrimaryPositionQuery(fullName) %>",
-      "exclude": "<% empty instanceListQuery %>",
-      "authType": "sso",
-      "deferred": "true"
-    },
-    {
-      "name": "getAllWorkers",
-      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
-      "authType": "sso"
-    }
   ],
-  "script": "<%
-
-             var getSearchURL = function(searchTXT)
-{
-                 if(searchTXT.isNumber())
-{
-                     var emplid = searchTXT;
-                         return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT fullName AS descriptor, employeeID as id FROM allWorkers WHERE employeeID = \\'' + emplid + '\\'');
-                 }
-                     else
-{
-                     return   'https://api.workday.com/common/v1/workers?search=' + searchTXT;
-                 }
-             };
-
-  var getPositionsQuery = function(searchTXT){
-
-      var fullName = searchTXT;
-      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
-
-  };
-
-             var getPrimaryPositionQuery = function(searchTXT){
-             var fullName = searchTXT;
-             return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
-             };
-
-
-  var moreThanOnePosition = function(workerName) {
-      var positionsData = getPositions.invoke({'fullName': workerName});
-      var listSize = positionsData.data[0].positionsForWorker;
-      if(listSize.size() > 1) {
-          return true
-      } else {
-      return false
-      }
-  };
-
-  var populateAllPositionsInstanceList = function(workerName){
-      var positionsData = getPositions.invoke({'fullName': workerName});
-      var allPositions = positionsData.data[0].positionsForWorker
-  }
-
-             %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
     "pageType": "edit",
     "title": {
       "type": "title",
-      "label": "Create New Security Request",
+      "label": "Security Request App",
       "enabled": true
     },
     "body": {
-      "type": "fieldSet",
+      "type": "section",
       "horizontal": false,
       "children": [
         {
-          "type": "instanceList",
-          "id": "workerSearch",
-          "label": "Search Worker",
-          "visible": false,
-          "values": "<% var list = []; %>",
-          "searchEndPoint": "<% endpoints.workerSearch %>",
-          "searchResultValues": "<% workerSearch.data %>",
-          "onChange": "<%
-          if (!empty workerSearch.value == true){ /* verifica si hay algo selecionado en el Mirror Worker */
-              var getNameFromSearch = workerSearch.selectedEntries[0].descriptor /* get el nombre del Worker */
-                  if(moreThanOnePosition(getNameFromSearch) == false){ /* si solo hay una position */
-                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
-                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
-                          var positionId = positionsData.data[0].positionsForWorker[0].id;
-
-                          var arrayOfIdsPosition = [];
-                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                      allPositionsInstanceList.setValues(allPositionsForWorker);
-                      allPositionsInstanceList.setValue(arrayOfIdsPosition);
-                  } else {
-                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
-
-                          var arrayOfIdsPosition = [];
-                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                      allPositionsInstanceList.setValues(allPositionsForWorker);
-                          allPositionsInstanceList.setValue(arrayOfIdsPosition);
-                  }
-          } else {
-              allPositionsInstanceList.setValues([]);
+          "type": "button",
+          "action": "PRIMARY",
+          "label": "Create New Security Request",
+          "taskReference": {
+            "taskId": "createSecurityRequest"
           }
-
-
-
-
-                       %>"
         },
         {
-          "type": "instanceList",
-          "id": "allPositionsInstanceList",
-          "label": "Choose a position to mirror",
-          "visible": false,
-          "values": "<% var list = []; %>"
-        },
-        {
-          "type": "instanceList",
-          "id": "getAllWorkersInstanceList",
-          "label": "Search a worker to copy the security groups from:",
-          "required": true,
-          "values": "<% getAllWorkers.data %>",
-          "onChange": "<% if (!empty getAllWorkersInstanceList.value == true) {
-              choosePositionFromInstanceList.visible = true;
-                  effectiveDate.visible = true;
-                  effectiveUntil.visible = true;
-                  justificationText.visible = true;
-                  getAllWorkersToInstanceList.visible = true;
-              var getNameFromSearch = getAllWorkersInstanceList.selectedEntries[0].descriptor
-                       if(moreThanOnePosition(getNameFromSearch) == false) {
-                           var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                               var allPositionsForWorker = positionsData.data[0].positionsForWorker
-                               var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
-                               var positionId = positionsData.data[0].positionsForWorker[0].id;
-
-                               var arrayOfIdsPosition = [];
-                               arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                               choosePositionFromInstanceList.setValues(allPositionsForWorker);
-                               choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
-
-                       } else {
-                           var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                               var allPositionsForWorker = positionsData.data[0].positionsForWorker
-
-                               var arrayOfIdsPosition = [];
-                               arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                               choosePositionFromInstanceList.setValues(allPositionsForWorker);
-                               choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
-                       }
-          } else {
-              choosePositionFromInstanceList.visible = false;
-              effectiveDate.visible = false;
-                  effectiveUntil.visible = false;
-                  justificationText.visible = false;
-                  getAllWorkersToInstanceList.visible = false;
-          } %>"
-        },
-        {
-          "type": "text",
-          "id": "mirrorWorker",
-          "value": "getAllWorkersInstanceList.value",
-          "valueOutBinding": "SecurityRequest.mirrorWorker",
-          "visible": false
-        },
-        {
-          "type": "instanceList",
-          "id": "choosePositionFromInstanceList",
-          "label": "Choose a position to mirror the security groups:",
-          "values": "<% var list = []; %>",
-          "required": true,
-          "visible": false
-        },
-        {
-          "type": "text",
-          "id": "mirrorPosition",
-          "value": "choosePositionFromInstanceList.value",
-          "valueOutBinding": "SecurityRequest.mirrorPosition"
-        },
-        {
-          "type": "instanceList",
-          "id": "getAllWorkersToInstanceList",
-          "label": "Choose the target worker:",
-          "required": true,
-          "visible": false,
-          "values": "<% getAllWorkers.data %>",
-          "onChange": "<% if (!empty getAllWorkersToInstanceList.value == true) {
-              choosePositionToInstanceList.visible = true;
-              var getNameFromSearch = getAllWorkersToInstanceList.selectedEntries[0].descriptor
-                  if(moreThanOnePosition(getNameFromSearch) == false) {
-                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
-                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
-                          var positionId = positionsData.data[0].positionsForWorker[0].id;
-
-                          var arrayOfIdsPosition = [];
-                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                          choosePositionToInstanceList.setValues(allPositionsForWorker);
-                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
-
-                  } else {
-                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
-                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
-
-                          var arrayOfIdsPosition = [];
-                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-
-                          choosePositionToInstanceList.setValues(allPositionsForWorker);
-                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
-                  }
-          } else {
-              choosePositionToInstanceList.visible = false;
-          } %>"
-        },
-        {
-          "type": "text",
-          "id": "targetWorker",
-          "value": "getAllWorkersToInstanceList.value",
-          "valueOutBinding": "SRTarget.targetWorker",
-          "visible": false
-        },
-        {
-          "type": "instanceList",
-          "id": "choosePositionToInstanceList",
-          "label": "Choose a position to receive the new security groups:",
-          "values": "<% var list = []; %>",
-          "required": true,
-          "visible": false
-        },
-        {
-          "type": "text",
-          "id": "targetPosition",
-          "value": "choosePositionToInstanceList.value",
-          "valueOutBinding": "SRTarget.targetPosition"
-        },
-        {
-          "type": "date",
-          "id": "effectiveDate",
-          "label": "Effective Date",
-          "required": true,
-          "visible": false,
-          "valueOutBinding": "SecurityRequest.effectiveDate"
-        },
-        {
-          "type": "date",
-          "id": "effectiveUntil",
-          "label": "Effective Until",
-          "required": false,
-          "visible": false,
-          "valueOutBinding": "SecurityRequest.effectiveUntil"
-        },
-        {
-          "type": "text",
-          "id": "justificationText",
-          "label": "Justification Text",
-          "required": false,
-          "visible": false,
-          "valueOutBinding": "SecurityRequest.justificationText"
-        },
-        {
-          "type": "editButtonBar",
-          "editButtons": [
-            {
-              "type": "editButton",
-              "label": "Submit",
-              "id": "submit",
-              "buttonType": "SECONDARY"
-            }
-          ]
-        }
-      ]
-    },
-    "footer": {
-      "type": "footer",
-      "children": [
-        {
-          "type": "richText",
-          "enabled": "false",
-          "value": "Sony Security Process Automation v1.0"
+          "type": "button",
+          "action": "PRIMARY",
+          "id": "manageSecurityRequests",
+          "label": "Manage Security Requests",
+          "taskReference": {
+            "taskId": "manageSecurityRquests"
+          }
         }
       ]
     }

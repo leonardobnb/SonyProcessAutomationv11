@@ -22,7 +22,8 @@
       "name": "mirrorWorker",
       "label": "Mirror Worker",
       "type": "SINGLE_INSTANCE",
-      "target": "WORKER"
+      "target": "WORKER",
+      "useForDisplay": true
     },
     {
       "id": 3,

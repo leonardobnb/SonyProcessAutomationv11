@@ -1,0 +1,130 @@
+{
+  "id": "updateSecurityRequest",
+  "endPoints":[
+    {
+      "name": "workerSearch",
+      "baseUrlType": "WORKDAY",
+      "url": "<%getSearchURL(instanceListQuery)%>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getPositions",
+      "baseUrlType": "WORKDAY",
+      "url": "<% getPositionsQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getPrimaryPosition",
+      "baseUrlType": "WORKDAY",
+      "url": "<% getPrimaryPositionQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getAllWorkers",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
+      "authType": "sso"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "updateSecurityRequest",
+        "baseUrlType" : "app",
+        "url": "<% 'securityRequests/' + securityRequest.id %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "values": [
+
+        ]
+      }
+    ]
+  },
+  "script": "<%
+
+             var getSearchURL = function(searchTXT)
+{
+                 if(searchTXT.isNumber())
+{
+                     var emplid = searchTXT;
+                         return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT fullName AS descriptor, employeeID as id FROM allWorkers WHERE employeeID = \\'' + emplid + '\\'');
+                 }
+                     else
+{
+                     return   'https://api.workday.com/common/v1/workers?search=' + searchTXT;
+                 }
+             };
+
+             var getPositionsQuery = function(searchTXT){
+
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+
+             };
+
+             var getPrimaryPositionQuery = function(searchTXT){
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+             };
+
+
+             var moreThanOnePosition = function(workerName) {
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var listSize = positionsData.data[0].positionsForWorker;
+                 if(listSize.size() > 1) {
+                     return true
+                 } else {
+                     return false
+                 }
+             };
+
+             var populateAllPositionsInstanceList = function(workerName){
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var allPositions = positionsData.data[0].positionsForWorker
+             }
+
+             %>",
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "Update Security Request",
+      "enabled": false
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "section",
+          "children": [
+            {
+              "type": "text",
+              "id": "mirrorPosition",
+              "label": "Mirror Position",
+              "required": "<% true %>",
+              "value": "<% securityRequest.mirrorPosition %>",
+              "valueOutBinding": "updateSecurityRequest.mirrorPosition.id"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}

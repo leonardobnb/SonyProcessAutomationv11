@@ -1,9 +1,40 @@
 {
   "appProperties": [],
+  "flowDefinitions": [
+    {
+      "id": "createSecurityRequestFlow",
+      "flowSteps": [
+        {
+          "id": "createSecurityRequest",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "manageSecurityRequests",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "createSecurityRequest"
+        },
+        {
+          "id": "manageSecurityRequests",
+          "endsFlow": true,
+          "taskId": "manageSecurityRequests"
+        }
+      ]
+    }
+  ],
   "tasks": [
     {
       "id": "root",
       "routingPattern": "/",
+      "page": {
+        "id": "home"
+      }
+    },
+    {
+      "id": "home",
+      "routingPattern": "/home",
       "page": {
         "id": "home"
       }
@@ -14,6 +45,27 @@
       "page": {
         "id": "SearchForWorker"
       }
+    },
+    {
+      "id": "createSecurityRequest",
+      "routingPattern": "createSecurityRequest",
+      "page": {
+        "id": "createSecurityRequest"
+      }
+    },
+    {
+      "id": "manageSecurityRequests",
+      "routingPattern": "/events/manageSecurityRequests",
+      "page": {
+        "id": "manageSecurityRequests"
+      }
+    },
+    {
+      "id": "updateSecurityRequest",
+      "routingPattern": "updateSecurityRequest",
+      "page": {
+        "id": "updateSecurityRequest"
+      }
     }
   ],
   "applicationId": "SonyProcessAutomationV1_qxbfwx",
@@ -21,6 +73,14 @@
     {
       "key": "WORKDAY",
       "value": "https://api.workday.com"
+    },
+    {
+      "key": "workday-bp",
+      "value": "https://api.workday.com/businessProcess/v1/"
+    },
+    {
+      "key": "app",
+      "value": "https://api.workday.com/apps/<% site.applicationId %>/v1/"
     }
   ]
 }
