@@ -1,0 +1,42 @@
+{
+  "id": "home",
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Workday Extend"
+    },
+    "body": {
+      "type": "section",
+      "children": [
+        {
+          "type": "button",
+          "id": "createNewSecurityRequestv11",
+          "label": "Create New Security Requestv11",
+          "action": "PRIMARY",
+          "taskReference": {
+            "taskId": "CreateSecurityRequestv11"
+          }
+        },
+        {
+          "type": "button",
+          "id": "manageSecurityRequestv11s",
+          "label": "Manage Security Requestv11s",
+          "action": "PRIMARY",
+          "taskReference": {
+            "taskId": "manageSecurityRequestv11s"
+          }
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "id": "manageSecurityRequestv11s",
+  "endPoints": [
+    {
+      "name": "securityRequestv11s",
+      "baseUrlType": "app",
+      "url": "securityRequestv11s",
+      "authType": "sso",
+      "isCollection": "true"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+    ]
+  },
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "View Security Requestv11s",
+      "enabled": true
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "grid",
+          "id": "securityRequestv11sgrid",
+          "label": "Security Requestv11s",
+          "rows": "<% securityRequestv11s.data %>",
+          "rowVariableName": "securityRequestv11",
+          "columns": [
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% securityRequestv11.fromWorker.descriptor %>"
+              },
+              "label": "From Worker",
+              "columnId": "fromWorker",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% securityRequestv11.fromPosition.descriptor %>"
+              },
+              "label": "From Position",
+              "columnId": "fromPosition",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "date",
+                "datePrecision": "DAY",
+                "dateFormat": "yyyy-MM-dd",
+                "value": "<% securityRequestv11.effectiveDate %>"
+              },
+              "label": "Effective Date",
+              "sortableAndFilterable": true,
+              "columnId": "effectiveDate",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "date",
+                "datePrecision": "DAY",
+                "dateFormat": "yyyy-MM-dd",
+                "value": "<% securityRequestv11.effectiveUntil %>"
+              },
+              "label": "Effective Until",
+              "sortableAndFilterable": true,
+              "columnId": "effectiveUntil",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% securityRequestv11.justificationText %>"
+              },
+              "label": "Justification ",
+              "columnId": "justificationText",
+              "type": "column"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}

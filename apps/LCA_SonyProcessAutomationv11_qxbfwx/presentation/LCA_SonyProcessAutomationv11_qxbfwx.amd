@@ -1,0 +1,37 @@
+{
+  "appProperties": [ ],
+  "tasks": [
+    {
+      "id": "root",
+      "routingPattern": "/",
+      "page": {
+        "id": "home"
+      }
+    },
+    {
+      "id": "CreateSecurityRequestv11",
+      "routingPattern": "CreateSecurityRequestv11",
+      "page": {
+        "id": "CreateSecurityRequestv11"
+      }
+    },
+    {
+      "id": "manageSecurityRequestv11s",
+      "routingPattern": "manageSecurityRequestv11s",
+      "page": {
+        "id": "manageSecurityRequestv11s"
+      }
+    }
+  ],
+  "applicationId": "LCA_SonyProcessAutomationv11_qxbfwx",
+  "dataProviders": [
+    {
+      "key": "app",
+      "value": "https://api.workday.com/apps/<% site.applicationId %>/v1/"
+    },
+    {
+      "key": "workday",
+      "value": "https://api.workday.com"
+    }
+  ]
+}

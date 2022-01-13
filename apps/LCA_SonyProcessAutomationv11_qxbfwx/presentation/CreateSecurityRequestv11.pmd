@@ -1,0 +1,209 @@
+{
+  "id": "CreateSecurityRequestv11",
+  "endPoints": [
+    {
+      "name": "getAllWorkers",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
+      "authType": "sso"
+    },
+    {
+      "name": "getPositions",
+      "baseUrlType": "workday",
+      "url": "<% getPositionsQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+
+        "name": "securityRequestv11",
+        "baseUrlType": "app",
+        "url": "securityRequestv11s",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "fromWorker.id",
+            "value": "<% fromWorker.value[0] %>"
+          },
+          {
+            "outboundPath": "fromPosition.id",
+            "value": "<% fromPosition.value[0] %>"
+          },
+          {
+            "outboundPath": "effectiveDate",
+            "value": "<% effectiveDate.value %>"
+          },
+          {
+            "outboundPath": "effectiveUntil",
+            "value": "<% effectiveUntil.value %>"
+          },
+          {
+            "outboundPath": "justificationText",
+            "value": "<% justificationText.value %>"
+          }
+        ]
+      }
+    ]
+  },
+  "script": "<%
+
+             var getPositionsQuery = function(searchTXT){
+
+      var fullName = searchTXT;
+      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+
+  };
+
+             var moreThanOnePosition = function(workerName) {
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var listSize = positionsData.data[0].positionsForWorker;
+                 if(listSize.size() > 1) {
+                     return true
+                 } else {
+                     return false
+                 }
+             };
+
+             %>",
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "Create New Security Request",
+      "enabled": true
+    },
+    "body": {
+      "type": "fieldSet",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "instanceList",
+          "id": "fromWorker",
+          "label": "Search a worker to copy the security groups from:",
+          "required": true,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty fromWorker.value == true) {
+
+              fromPosition.visible = true;
+                  effectiveDate.visible = true;
+                  effectiveUntil.visible = true;
+                  justificationText.visible = true;
+                  toWorker.visible= true;
+
+          var getNameFromSearch = fromWorker.selectedEntries[0].descriptor;
+
+              if(moreThanOnePosition(getNameFromSearch) == false) {
+
+                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                      var arrayOfIdsPosition = [];
+                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                  fromPosition.setValues(allPositionsForWorker);
+                  fromPosition.setValue(arrayOfIdsPosition);
+              } else {
+                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                      var arrayOfIdsPosition = [];
+                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                  fromPosition.setValues(allPositionsForWorker);
+                  fromPosition.setValue(arrayOfIdsPosition);
+              }
+          } else {
+          fromPosition.visible = false;
+              effectiveDate.visible = false;
+              effectiveUntil.visible = false;
+              justificationText.visible = false;
+              toWorker.setValue([]);
+              toPosition.setValue([]);
+              toWorker.visible = false;
+              toPosition.visible = false;
+          } %>"
+        },
+        {
+          "type": "instanceList",
+          "id": "fromPosition",
+          "label": "Choose a position to mirror the security groups:",
+          "values": "<%var list = []%>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "instanceList",
+          "id": "toWorker",
+          "label": "Choose the target worker:",
+          "required": true,
+          "visible": false,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty toWorker.value == true) {
+              toPosition.visible = true;
+          var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
+
+              if(moreThanOnePosition(getNameFromSearch) == false) {
+                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                      var arrayOfIdsPosition = [];
+                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                  toPosition.setValues(allPositionsForWorker);
+                  toPosition.setValue(arrayOfIdsPosition);
+              } else {
+                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+
+                      var arrayOfIdsPosition = [];
+                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                      toPosition.setValues(allPositionsForWorker);
+                      toPosition.setValue(arrayOfIdsPosition);
+              }
+          } else {
+          toPosition.visible = false;
+          } %>"
+        },
+        {
+          "type": "instanceList",
+          "id": "toPosition",
+          "label": "Choose a position to receive the new security groups:",
+          "values": "<% var list = []; %>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveDate",
+          "label": "Effective Date",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "required": false,
+          "visible": false
+        },
+        {
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "required": false,
+          "visible": false
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}
