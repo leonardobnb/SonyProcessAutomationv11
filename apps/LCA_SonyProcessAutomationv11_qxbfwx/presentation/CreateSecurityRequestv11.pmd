@@ -47,6 +47,25 @@
             "value": "<% justificationText.value %>"
           }
         ]
+      },
+      {
+
+        "name": "sRTargetv11",
+        "baseUrlType": "app",
+        "url": "sRTargetv11s",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "toWorker.id",
+            "value": "<% toWorker.value[0] %>"
+          },
+          {
+            "outboundPath": "toPosition.id",
+            "value": "<% toPosition.value[0] %>"
+          }
+        ]
       }
     ]
   },

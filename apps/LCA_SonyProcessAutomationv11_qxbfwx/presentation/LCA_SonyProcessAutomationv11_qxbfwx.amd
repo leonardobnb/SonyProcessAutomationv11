@@ -1,5 +1,29 @@
 {
   "appProperties": [ ],
+  "flowDefinitions": [
+    {
+      "id": "createSecurityRequestFlow",
+      "flowSteps": [
+        {
+          "id": "createSecurityRequestv11",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "manageSecurityRequestv11s",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "CreateSecurityRequestv11"
+        },
+        {
+          "id": "manageSecurityRequestv11s",
+          "endsFlow": true,
+          "taskId": "manageSecurityRequestv11s"
+        }
+      ]
+    }
+  ],
   "tasks": [
     {
       "id": "root",

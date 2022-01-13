@@ -7,6 +7,13 @@
       "url": "securityRequestv11s",
       "authType": "sso",
       "isCollection": "true"
+    },
+    {
+      "name": "sRTargetv11s",
+      "baseUrlType": "app",
+      "url": "sRTargetv11s",
+      "authType": "sso",
+      "isCollection": "true"
     }
   ],
   "outboundData": {
@@ -37,6 +44,7 @@
                 "type": "text",
                 "value": "<% securityRequestv11.fromWorker.descriptor %>"
               },
+              "id": "fromWorker.descriptor",
               "label": "From Worker",
               "columnId": "fromWorker",
               "type": "column"
@@ -46,8 +54,29 @@
                 "type": "text",
                 "value": "<% securityRequestv11.fromPosition.descriptor %>"
               },
+              "id": "fromPosition.descriptor",
               "label": "From Position",
               "columnId": "fromPosition",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% sRTargetv11s.data[0].toWorker.descriptor %>"
+              },
+              "id": "toWorker.descriptor2",
+              "label": "To Worker",
+              "columnId": "toWorker2",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% sRTargetv11s.data[0].toPosition.descriptor %>"
+              },
+              "id": "toPosition.descriptor2",
+              "label": "To Position",
+              "columnId": "toPosition2",
               "type": "column"
             },
             {
@@ -57,6 +86,7 @@
                 "dateFormat": "yyyy-MM-dd",
                 "value": "<% securityRequestv11.effectiveDate %>"
               },
+              "id": "effectiveDate",
               "label": "Effective Date",
               "sortableAndFilterable": true,
               "columnId": "effectiveDate",
@@ -69,6 +99,7 @@
                 "dateFormat": "yyyy-MM-dd",
                 "value": "<% securityRequestv11.effectiveUntil %>"
               },
+              "id": "effectiveUntil",
               "label": "Effective Until",
               "sortableAndFilterable": true,
               "columnId": "effectiveUntil",
@@ -79,8 +110,38 @@
                 "type": "text",
                 "value": "<% securityRequestv11.justificationText %>"
               },
+              "id": "justificationText",
               "label": "Justification ",
               "columnId": "justificationText",
+              "type": "column"
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "id": "sRTargetv11sgrid",
+          "label": "Security Requestv11s",
+          "rows": "<% sRTargetv11s.data %>",
+          "rowVariableName": "sRTargetv11",
+          "columns": [
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% sRTargetv11.toWorker.descriptor %>"
+              },
+              "id": "toWorker.descriptor",
+              "label": "To Worker",
+              "columnId": "toWorker",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% sRTargetv11.toPosition %>"
+              },
+              "id": "toPosition",
+              "label": "To Position",
+              "columnId": "toPosition",
               "type": "column"
             }
           ]
