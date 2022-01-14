@@ -14,6 +14,13 @@
       "httpMethod": "GET",
       "url": "<% 'securityRequestv11s/' + event.for.id %>",
       "authType": "sso"
+    },
+    {
+      "name": "sRTargetv11",
+      "baseUrlType": "app",
+      "httpMethod": "GET",
+      "url": "<% 'sRTargetv11s/' %>",
+      "authType": "sso"
     }
   ],
   "presentation": {
@@ -47,6 +54,30 @@
               "id": "<% securityRequestv11.fromPosition.id %>",
               "descriptor": "<% securityRequestv11.fromPosition.descriptor %>",
               "wid": "<% securityRequestv11.fromPosition.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "toWorker",
+          "label": "To Worker",
+          "instanceList": [
+            {
+              "id": "<% sRTargetv11.data.last().toWorker.id %>",
+              "descriptor": "<% sRTargetv11.data.last().toWorker.descriptor %>",
+              "wid": "<% sRTargetv11.data.last().toWorker.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "toPosition",
+          "label": "To Position",
+          "instanceList": [
+            {
+              "id": "<% sRTargetv11.data.last().toPosition.id %>",
+              "descriptor": "<% sRTargetv11.data.last().toPosition.descriptor %>",
+              "wid": "<% sRTargetv11.data.last().toPosition.id %>"
             }
           ]
         },

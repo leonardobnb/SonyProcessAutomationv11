@@ -64,6 +64,10 @@
           {
             "outboundPath": "toPosition.id",
             "value": "<% toPosition.value[0] %>"
+          },
+          {
+            "outboundPath": "referenceToSecurityRequestv11.id",
+            "value": "<% securityRequestv11.id %>"
           }
         ]
       },

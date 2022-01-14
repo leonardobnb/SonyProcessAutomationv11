@@ -22,6 +22,12 @@
       "name": "toPosition",
       "type": "SINGLE_INSTANCE",
       "target": "POSITION"
+    },
+    {
+      "id": 3,
+      "name": "referenceToSecurityRequestv11",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequestv11"
     }
   ]
 }
