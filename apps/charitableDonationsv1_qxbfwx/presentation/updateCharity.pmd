@@ -1,0 +1,93 @@
+{
+  "id": "updateCharity",
+  "endPoints": [
+    {
+      "name": "charity",
+      "baseUrlType": "app",
+      "url": "<% 'charities/' + queryParams.charityId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "workerSearch",
+      "baseUrlType": "workday-staffing",
+      "url": "<% 'workers?search=' + instanceListQuery %>",
+      "exclude": "<% empty(instanceListQuery) %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "updateCharity",
+        "baseUrlType": "app",
+        "url": "<% 'charities/' + charity.id %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "values": [
+          {
+            "outboundPath": "image",
+            "value": "<% charity.image ?: null %>"
+          }
+        ]
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Update Charity"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "horizontal": true,
+      "sorted": false,
+      "children": [
+        {
+          "type": "section",
+          "children": [
+            {
+              "type": "text",
+              "id": "name",
+              "label": "Name",
+              "required": "<% true %>",
+              "value": "<% charity.name %>",
+              "valueOutBinding": "updateCharity.name"
+            },
+            {
+              "type": "richText",
+              "id": "description",
+              "label": "Description",
+              "value": "<% charity.description %>",
+              "valueOutBinding": "updateCharity.description"
+            },
+            {
+              "type": "checkBox",
+              "id": "matchDonations",
+              "label": "Match Donations",
+              "value": "<% charity.matchDonations %>",
+              "valueOutBinding": "updateCharity.matchDonations"
+            },
+            {
+              "type": "instanceList",
+              "searchEndPoint": "<% endpoints.workerSearch %>",
+              "multiSelect": "false",
+              "id": "instanceListWorkerSearch",
+              "label": "Relationship Manager",
+              "searchResultValues": "<% workerSearch.data %>",
+              "required": "<% true %>",
+              "values": "<% (!(empty(charity.relationshipManager))) ? [charity.relationshipManager] : [] %>",
+              "selectedValues": "<% (!(empty(charity.relationshipManager))) ? [charity.relationshipManager] : [] %>",
+              "valueOutBinding": "updateCharity.relationshipManager.id"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

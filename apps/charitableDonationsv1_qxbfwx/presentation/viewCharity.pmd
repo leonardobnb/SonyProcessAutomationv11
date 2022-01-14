@@ -1,0 +1,78 @@
+{
+  "id": "viewCharity",
+  "endPoints": [
+    {
+      "name": "charity",
+      "baseUrlType": "app",
+      "url": "<% 'charities/' + queryParams.charityId %>",
+      "authType": "sso"
+    }
+  ],
+  "presentation": {
+    "headerSize": "STANDARD",
+    "title": {
+      "type": "title",
+      "label": "View Charity"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": true,
+      "children": [
+        {
+          "type": "section",
+          "horizontal": false,
+          "sorted": false,
+          "children": [
+            {
+              "type": "richText",
+              "value": "<% '<h1>' + charity.descriptor + '</h1>' %>"
+            },
+            {
+              "type": "image",
+              "sizingHint": "INLINE",
+              "endPoint": {
+                "url": "charityImages/<% charity.image.id %>",
+                "baseUrlType": "app",
+                "authType": "sso"
+              }
+            },
+            {
+              "type": "richText",
+              "label": "Description",
+              "value": "<% charity.description %>"
+            },
+            {
+              "type": "checkBox",
+              "label": "Company Match",
+              "trueLabel": "Yes",
+              "falseLabel": "No",
+              "value": "<% charity.matchDonations %>"
+            },
+            {
+              "type": "instanceList",
+              "label": "Relationship Manager",
+              "instanceList": [
+                {
+                  "id": "<% charity.relationshipManager.id %>",
+                  "descriptor": "<% charity.relationshipManager.descriptor %>",
+                  "wid": "<% charity.relationshipManager.id %>"
+                }
+              ]
+            },
+            {
+              "type": "button",
+              "action": "SECONDARY",
+              "label": "Donate",
+              "taskReference": {
+                "taskId": "donate",
+                "parameterBindings": {
+                  "charityId": "<% queryParams.charityId %>"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

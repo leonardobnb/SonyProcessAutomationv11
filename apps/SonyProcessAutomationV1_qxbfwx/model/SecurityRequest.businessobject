@@ -14,8 +14,7 @@
       "id": 1,
       "name": "securityRequestID",
       "label": "Security Request ID",
-      "type": "TEXT",
-      "isReferenceId": true
+      "type": "TEXT"
     },
     {
       "id": 2,

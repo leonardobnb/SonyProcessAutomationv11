@@ -1,0 +1,157 @@
+{
+  "appProperties": [
+    {
+      "key": "appName",
+      "value": "Create an Event"
+    }
+  ],
+  "flowDefinitions": [
+    {
+      "id": "createEventFlow",
+      "flowSteps": [
+        {
+          "id": "createEvent",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "manageEvents",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "createEvent"
+        },
+        {
+          "id": "manageEvents",
+          "endsFlow": true,
+          "taskId": "manageEvents"
+        }
+      ]
+    },
+    {
+      "id": "updateEventFlow",
+      "flowSteps": [
+        {
+          "id": "updateEvent",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "manageEvents",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "updateEvent"
+        },
+        {
+          "id": "ManageEvents",
+          "endsFlow": true,
+          "taskId": "manageEvents"
+        }
+      ]
+    },
+    {
+      "id": "updateEventImageFlow",
+      "flowSteps": [
+        {
+          "id": "updateEventImage",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "manageEvents",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "updateEventImage"
+        },
+        {
+          "id": "updateEventImageManageEvents",
+          "endsFlow": true,
+          "taskId": "manageEvents"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "root",
+      "routingPattern": "/",
+      "page": {
+        "id": "home"
+      }
+    },
+    {
+      "id": "home",
+      "routingPattern": "/home",
+      "page": {
+        "id": "home"
+      }
+    },
+    {
+      "id": "manageEvents",
+      "routingPattern": "/events/manage",
+      "page": {
+        "id": "manageEvents"
+      }
+    },
+    {
+      "id": "ViewEventList",
+      "routingPattern": "ViewEventList",
+      "page": {
+        "id": "ViewEventList"
+      }
+    },
+    {
+      "id": "viewEvent",
+      "routingPattern": "viewEvent",
+      "page": {
+        "id": "viewEvent"
+      }
+    },
+    {
+      "id": "updateEvent",
+      "routingPattern": "/events/{eventId}/update",
+      "page": {
+        "id": "updateEvent"
+      }
+    },
+    {
+      "id": "updateEventImage",
+      "routingPattern": "/events/{eventId}/updateImage",
+      "page": {
+        "id": "updateEventImage"
+      }
+    },
+    {
+      "id": "createEvent",
+      "routingPattern": "CreateEvent",
+      "page": {
+        "id": "createEvent"
+      }
+    }
+  ],
+  "applicationId": "LCA_createAnEvent",
+  "dataProviders": [
+    {
+      "key": "app",
+      "value": "https://api.workday.com/apps/<% site.applicationId %>/v1/"
+    },
+    {
+      "key": "workday-bp",
+      "value": "https://api.workday.com/<% site.applicationId %>/v1/createEventEvents"
+    },
+    {
+      "key": "workday-staffing",
+      "value": "https://api.workday.com/staffing/v1/"
+    },
+    {
+      "key": "workday-payroll",
+      "value": "https://api.workday.com/payroll/v1/"
+    },
+    {
+      "key": "workday-wql",
+      "value": "https://api.workday.com/wql/v1/"
+    }
+  ]
+}

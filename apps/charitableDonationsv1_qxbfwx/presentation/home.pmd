@@ -1,0 +1,71 @@
+{
+  "id": "home",
+  "endPoints": [
+    {
+      "baseUrlType": "workday-staffing",
+      "name": "worker",
+      "authType": "sso",
+      "url": "workers/me"
+    }
+  ],
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "<% site.appProperties.appName %>"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "section",
+          "horizontal": true,
+          "children": [
+            {
+              "type": "section",
+              "horizontal": false,
+              "sorted": false,
+              "children": [
+                {
+                  "type": "button",
+                  "action": "PRIMARY",
+                  "label": "Make a Charitable Donation",
+                  "taskReference": {
+                    "taskId": "donateSelect"
+                  }
+                },
+                {
+                  "type": "button",
+                  "action": "AUXILIARY",
+                  "label": "My Charitable Donations",
+                  "taskReference": {
+                    "taskId": "manageMyDonations"
+                  }
+                },
+                {
+                  "type": "button",
+                  "action": "AUXILIARY",
+                  "label": "Manage Charities",
+                  "taskReference": {
+                    "taskId": "manageCharities"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "pod",
+          "podId": "footer"
+        }
+      ]
+    }
+  }
+}

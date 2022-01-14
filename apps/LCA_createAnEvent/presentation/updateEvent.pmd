@@ -1,0 +1,130 @@
+{
+  "id": "updateEvent",
+  "endPoints": [
+    {
+      "name": "event",
+      "baseUrlType": "app",
+      "url": "<% 'events/' + queryParams.eventId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "workerSearch",
+      "baseUrlType": "workday-staffing",
+      "url": "<% 'workers?search=' + instanceListQuery %>",
+      "exclude": "<% empty(instanceListQuery) %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "updateEvent",
+        "baseUrlType": "app",
+        "url": "<% 'events/' + event.id %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "values": [
+          {
+            "outboundPath": "image",
+            "value": "<% event.image ?: null %>"
+          }
+        ]
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Update Event"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "horizontal": true,
+      "sorted": false,
+      "children": [
+        {
+          "type": "section",
+          "horizontal": true,
+          "children": [
+            {
+              "type": "text",
+              "id": "name",
+              "label": "Event Name",
+              "required": "<% true %>",
+              "value": "<% event.name %>",
+              "valueOutBinding": "updateEvent.name"
+            },
+            {
+              "type": "richText",
+              "id": "description",
+              "label": "Description",
+              "value": "<% event.description %>",
+              "valueOutBinding": "updateEvent.description"
+            },
+            {
+              "type": "text",
+              "id": "location",
+              "label": "Event Location",
+              "value": "<% event.location %>",
+              "valueOutBinding": "updateEvent.location"
+            },
+            {
+              "type": "date",
+              "id": "date",
+              "datePrecision": "DAY",
+              "dateFormat": "yyyy-MM-dd HH:mm:ss",
+              "label": "Date of Event",
+              "value": "<% event.date %>",
+              "valueOutBinding": "updateEvent.date"
+            },
+            {
+              "type": "text",
+              "id": "sponsor",
+              "label": "Event Sponsor",
+              "value": "<% event.sponsor %>",
+              "valueOutBinding": "updateEvent.sponsor"
+            },
+            {
+              "type": "currency",
+              "currencyCode": "USD",
+              "id": "cost",
+              "label": "Fee (USD)",
+              "valuesOut": [
+                {
+                  "value": "USD",
+                  "valueOutBinding": "updateEvent.cost.currency"
+                },
+                {
+                  "value": "<% cost.value %>",
+                  "valueOutBinding": "updateEvent.cost.value"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "contactInfo",
+              "label": "Contact Info/Email",
+              "value": "<% event.contactInfo %>",
+              "valueOutBinding": "updateEvent.contactInfo"
+            },
+            {
+              "type": "checkBox",
+              "id": "extendOnly",
+              "valueOutBinding": "event.extendOnly",
+              "value": "<% event.extendOnly %>",
+              "trueLabel": "Yes",
+              "falseLabel": "No",
+              "label": "Is this a Workday Extend only event?"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

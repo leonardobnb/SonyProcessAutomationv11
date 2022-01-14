@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "CreateEvent",
+  "label": "Create Event",
+  "description": "Business Process Type for Create Event",
+  "targetBusinessObject": "Event",
+  "allowsCancel": true,
+  "useForOrchestrate": true,
+  "approvalStep": {
+    "actions": ["APPROVE", "DENY"]
+  }
+}

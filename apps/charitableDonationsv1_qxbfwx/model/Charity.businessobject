@@ -1,0 +1,78 @@
+{
+  "id": 1,
+  "name": "Charity",
+  "label": "Charity",
+  "defaultSecurityDomains": [
+    "ManageCharities"
+  ],
+  "defaultCollection": {
+    "name": "charities",
+    "label": "All Charities"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "name",
+      "type": "TEXT",
+      "label": "Name",
+      "useForDisplay": true
+    },
+    {
+      "id": 2,
+      "name": "description",
+      "type": "TEXT",
+      "label": "Description"
+    },
+    {
+      "id": 3,
+      "name": "matchDonations",
+      "type": "BOOLEAN",
+      "label": "Match Donations"
+    },
+    {
+      "id": 4,
+      "name": "relationshipManager",
+      "type": "SINGLE_INSTANCE",
+      "label": "Relationship Manager",
+      "target": "WORKER"
+    },
+    {
+      "id": 5,
+      "name": "image",
+      "type": "SINGLE_INSTANCE",
+      "label": "Image",
+      "target": "CharityImage"
+    },
+    {
+      "id": 6,
+      "name": "createdBy",
+      "type": "SINGLE_INSTANCE",
+      "label": "Created By",
+      "target": "WORKER",
+      "secureByTarget": true
+    }
+  ],
+  "derivedFields": [
+    {
+      "id": 1,
+      "name": "imageUploadedBefore2021",
+      "type": "BOOLEAN",
+      "label": "Image Before 2021",
+      "expression": "image.uploadedDate.toYear().toNumber() < 2021"
+    },
+    {
+      "id": 2,
+      "name": "imageLabel",
+      "type": "TEXT",
+      "label": "Image Label",
+      "expression": "imageUploadedBefore2021 ? 'Old Image' : 'New Image'"
+    },
+    {
+      "id": 3,
+      "name": "workdayMatched",
+      "type": "BOOLEAN",
+      "label": "Workday Matched Charity",
+      "expression": "matchDonations && (description == 'Workday Charity')"
+    }
+  ]
+}

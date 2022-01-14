@@ -1,0 +1,220 @@
+{
+  "id": "updateEventImage",
+  "endPoints": [
+    {
+      "name": "worker",
+      "baseUrlType": "workday-staffing",
+      "url": "workers/me",
+      "authType": "sso"
+    },
+    {
+      "name": "event",
+      "baseUrlType": "app",
+      "url": "<% 'events/' + queryParams.eventId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "eventImage",
+      "baseUrlType": "app",
+      "url": "<% 'eventImages/' + event.image.id %>",
+      "exclude": "<% empty(event.image) %>",
+      "authType": "sso"
+    },
+    {
+      "name": "eventImageMetadata",
+      "baseUrlType": "app",
+      "url": "<% 'eventImages/' + event.image.id %>",
+      "exclude": "<% empty(event.image) %>",
+      "authType": "sso",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "_comment": "Get the Event Image metadata by specifying the Accept header as JSON."
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "updateEvent",
+        "baseUrlType": "app",
+        "url": "<% 'events/' + event.id %>",
+        "authType": "sso",
+        "onSend": "<%
+                   //Uncomment the below lines only for debugging purposes
+                   console.info(json:asJSON(self.data));
+                   return self.data;
+                   %>",
+        "httpMethod": "PUT",
+        "exclude": "<% (!(empty(event.image))) %>",
+        "values": [
+          {
+            "outboundPath": "image.id",
+            "value": "<% createEventImage.id %>",
+            "_comment": "Set Event Image relationship with ID returned by createEventImage endpoint."
+          },
+          {
+            "outboundPath": "name",
+            "value": "<% event.name %>"
+          },
+          {
+            "outboundPath": "description",
+            "value": "<% event.description %>"
+          }
+        ],
+        "_comment": "Set the newly created Event Image on the Event since the relationship did not previously exist. We need to provide all existing values on the Event so they do not fall off since this is a PUT."
+      },
+      {
+        "name": "createEventImage",
+        "baseUrlType": "app",
+        "url": "eventImages",
+        "authType": "sso",
+        "onSend": "<%
+                   //Uncomment the below lines only for debugging purposes
+                   console.info(json:asJSON(self.data));
+                   return self.data;
+                   %>",
+        "httpMethod": "POST",
+        "multiPartFileLast": true,
+        "exclude": "<% (!(empty(event.image))) %>",
+        "_comment": "Create a new Event Image if one does not exist"
+      },
+      {
+        "name": "updateEventImage",
+        "baseUrlType": "app",
+        "url": "<% 'eventImages/' + event.image.id %>",
+        "authType": "sso",
+        "onSend": "<%
+                   //Uncomment the below lines only for debugging purposes
+                   console.info(json:asJSON(self.data));
+                   return self.data;
+                   %>",
+        "httpMethod": "PUT",
+        "multiPartFileLast": true,
+        "exclude": "<% empty(event.image) %>",
+        "_comment": "Update the existing Event Image if one exists"
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Update Event Image"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "title": "Event",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "value": "<% event.name %>",
+          "enabled": "<% false %>"
+        },
+        {
+          "type": "section",
+          "horizontal": true,
+          "sorted": false,
+          "children": [
+            {
+              "type": "section",
+              "horizontal": false,
+              "sorted": false,
+              "children": [
+                {
+                  "type": "hidden",
+                  "value": "<% worker.id %>",
+                  "valueOutBinding": "<% empty(event.image) ? 'createEventImage:data:uploadedBy.id' : 'updateEventImage:data:uploadedBy.id' %>"
+                },
+                {
+                  "type": "hidden",
+                  "value": "<% date:getTodaysDate(null) %>",
+                  "valueOutBinding": "<% empty(event.image) ? 'createEventImage:data:uploadedDate' : 'updateEventImage:data:uploadedDate' %>"
+                },
+                {
+                  "type": "hidden",
+                  "value": "cid:image",
+                  "valueOutBinding": "<% empty(event.image) ? 'createEventImage:data:file' : 'updateEventImage:data:file' %>"
+                },
+                {
+                  "type": "fileUploader",
+                  "id": "imageFileUploader",
+                  "label": "New Image",
+                  "singular": "<% true %>",
+                  "compact": "<% false %>",
+                  "required": "<% true %>",
+                  "fileTypes": "gif,jpg,jpeg,png",
+                  "valueOutBinding": "<% empty(event.image) ? 'createEventImage:image:' : 'updateEventImage:image:' %>"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "title": "Current Image",
+              "horizontal": false,
+              "sorted": false,
+              "children": [
+                {
+                  "type": "section",
+                  "id": "currentImageInfo",
+                  "horizontal": false,
+                  "sorted": false,
+                  "render": "<% (!(empty(event.image))) %>",
+                  "children": [
+                    {
+                      "type": "image",
+                      "sizingHint": "INLINE",
+                      "id": "currentEventImage",
+                      "endPoint": {
+                        "url": "eventImages/<% event.image.id %>",
+                        "baseUrlType": "app",
+                        "authType": "sso"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "uploadedBy",
+                      "label": "Uploaded By",
+                      "value": "<% eventImageMetadata.uploadedBy.descriptor %>",
+                      "enabled": "<% false %>"
+                    },
+                    {
+                      "type": "text",
+                      "label": "Uploaded Date",
+                      "id": "uploadedDate",
+                      "enabled": "<% false %>",
+                      "value": "<% eventImageMetadata.uploadedDate %>"
+                    },
+                    {
+                      "type": "text",
+                      "label": "File Size",
+                      "id": "fileSize",
+                      "value": "<% file:byteCountToDisplaySize(eventImageMetadata.fileLength) %>",
+                      "enabled": "<% false %>"
+                    }
+                  ]
+                },
+                {
+                  "type": "readOnlyText",
+                  "id": "noImageMessage",
+                  "value": "There is currently no image for this Event.",
+                  "render": "<% empty(event.image) %>"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

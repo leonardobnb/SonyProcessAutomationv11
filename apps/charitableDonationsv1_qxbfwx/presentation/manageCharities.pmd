@@ -1,0 +1,137 @@
+{
+  "id": "manageCharities",
+  "endPoints": [
+    {
+      "name": "charities",
+      "baseUrlType": "app",
+      "url": "charities",
+      "authType": "sso",
+      "isCollection": "true"
+    }
+  ],
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Manage Charities"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "section",
+          "horizontal": true,
+          "children": [
+            {
+              "type": "button",
+              "action": "PRIMARY",
+              "label": "Create Charity",
+              "taskReference": {
+                "taskId": "createCharity"
+              }
+            }
+          ]
+        },
+        {
+          "id": "charitiesGrid",
+          "columns": [
+            {
+              "cellTemplate": {
+                "type": "instanceList",
+                "instanceList": [
+                  {
+                    "id": "<% charity.id %>",
+                    "descriptor": "<% charity.descriptor %>",
+                    "wid": "<% charity.id %>"
+                  }
+                ],
+                "selectedValues": "<% [charity.id] %>",
+                "enabled": "<% false %>"
+              },
+              "label": "Charity",
+              "columnId": "Charity",
+              "type": "column",
+              "sortableAndFilterable": "<% true %>"
+            },
+            {
+              "cellTemplate": {
+                "type": "richText",
+                "value": "<% charity.description %>"
+              },
+              "label": "Description",
+              "columnId": "description",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "checkBox",
+                "trueLabel": "Yes",
+                "falseLabel": "No",
+                "value": "<% charity.matchDonations %>"
+              },
+              "label": "Match Donations",
+              "columnId": "matchDonations",
+              "type": "column",
+              "sortableAndFilterable": "<% true %>"
+            },
+            {
+              "cellTemplate": {
+                "type": "instanceList",
+                "instanceList": [
+                  {
+                    "id": "<% charity.relationshipManager.id %>",
+                    "descriptor": "<% charity.relationshipManager.descriptor %>",
+                    "wid": "<% charity.relationshipManager.id %>"
+                  }
+                ],
+                "selectedValues": "<% [charity.relationshipManager.id] %>",
+                "enabled": "<% false %>"
+              },
+              "label": "Relationship Manager",
+              "columnId": "relationshipManager",
+              "type": "column",
+              "sortableAndFilterable": "<% true %>"
+            },
+            {
+              "cellTemplate": {
+                "type": "section",
+                "children": [
+                  {
+                    "type": "button",
+                    "action": "AUXILIARY",
+                    "label": "Update",
+                    "taskReference": {
+                      "taskId": "updateCharity",
+                      "parameterBindings": {
+                        "charityId": "<% charity.id %>"
+                      }
+                    }
+                  },
+                  {
+                    "type": "button",
+                    "action": "AUXILIARY",
+                    "label": "Update Image",
+                    "taskReference": {
+                      "taskId": "updateCharityImage",
+                      "parameterBindings": {
+                        "charityId": "<% charity.id %>"
+                      }
+                    }
+                  }
+                ]
+              },
+              "columnId": "actions",
+              "type": "column"
+            }
+          ],
+          "label": "Charities",
+          "type": "grid",
+          "rows": "<% charities.data %>",
+          "rowVariableName": "charity"
+        }
+      ]
+    }
+  }
+}

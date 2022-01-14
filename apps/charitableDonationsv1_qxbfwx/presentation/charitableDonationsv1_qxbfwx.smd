@@ -1,0 +1,21 @@
+{
+  "id": "charitableDonationsv1_qxbfwx",
+  "languages": [
+    {
+      "code": "en-US",
+      "description": "English"
+    }
+  ],
+  "siteAuth": {
+    "authTypes": [
+      {
+        "scheme": "SSO",
+        "id": "sso"
+      }
+    ]
+  },
+  "siteId": "charitableDonationsv1_qxbfwx",
+  "cdnEnabled": true,
+  "siteProperties": [ ],
+  "applicationId": "charitableDonationsv1_qxbfwx"
+}

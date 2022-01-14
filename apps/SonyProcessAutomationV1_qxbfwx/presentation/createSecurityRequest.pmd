@@ -1,0 +1,306 @@
+{
+  "id": "createSecurityRequest",
+  "endPoints":[
+    {
+      "name": "getPositions",
+      "baseUrlType": "WORKDAY",
+      "url": "<% getPositionsQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getAllWorkers",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
+      "authType": "sso"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "securityRequest",
+        "baseUrlType": "app",
+        "url": "securityRequests",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "_comment": "Outbound endpoint that submits the BO",
+        "values": [
+          {
+            "outboundPath": "securityRequest.mirrorWorker",
+            "value": "<% mirrorWorker.value[0] %>"
+          },
+          {
+            "outboundPath": "securityRequest.mirrorPosition",
+            "value": "<% mirrorPosition.value[0] %>"
+          },
+          {
+            "outboundPath": "securityRequest.effectiveDate",
+            "value": "<% effectiveDate.value %>"
+          },
+          {
+            "outboundPath": "securityRequest.effectiveUntil",
+            "value": "<% effectiveUntil.value %>"
+          },
+          {
+            "outboundPath": "securityRequest.justificationText",
+            "value": "<% justificationText.value %>"
+          }
+        ]
+      },
+      {
+        "_comment": "Kicks off BP. Pass in ID of the Event business object and when it is successfully created will trigger BP. Name element is the name of the BP in lower camel case + 'Events' from the .businessprocess file",
+        "name": "createSecurityRequestEvents",
+        "baseUrlType": "app",
+        "url": "securityRequestEventsEvents",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<%
+                   //Uncomment the below lines only for debugging purposes
+                   console.info(json:asJSON(self.data));
+                   return self.data;
+                   %>",
+        "values": [
+          {
+            "outboundPath": "businessProcessTarget.id",
+            "value": "<% securityRequest.id %>",
+            "_comment": "value above must match name of the outbound endpoint that submits the BO"
+          }
+        ]
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "script": "<%
+
+             var getSearchURL = function(searchTXT)
+{
+                 if(searchTXT.isNumber())
+{
+                     var emplid = searchTXT;
+                         return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT fullName AS descriptor, employeeID as id FROM allWorkers WHERE employeeID = \\'' + emplid + '\\'');
+                 }
+                     else
+{
+                     return   'https://api.workday.com/common/v1/workers?search=' + searchTXT;
+                 }
+             };
+
+             var getPositionsQuery = function(searchTXT){
+
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+
+             };
+
+             var getPrimaryPositionQuery = function(searchTXT){
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+             };
+
+
+             var moreThanOnePosition = function(workerName) {
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var listSize = positionsData.data[0].positionsForWorker;
+                 if(listSize.size() > 1) {
+                     return true
+                 } else {
+                     return false
+                 }
+             };
+
+             var populateAllPositionsInstanceList = function(workerName){
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var allPositions = positionsData.data[0].positionsForWorker
+             }
+
+             %>",
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "Create New Security Request",
+      "enabled": true
+    },
+    "body": {
+      "type": "fieldSet",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "instanceList",
+          "id": "getAllWorkersInstanceList",
+          "label": "Search a worker to copy the security groups from:",
+          "required": true,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty getAllWorkersInstanceList.value == true) {
+
+              choosePositionFromInstanceList.visible = true;
+                  effectiveDate.visible = true;
+                  effectiveUntil.visible = true;
+                  justificationText.visible = true;
+                  getAllWorkersToInstanceList.visible = true;
+
+                  var getNameFromSearch = getAllWorkersInstanceList.selectedEntries[0].descriptor
+                  if(moreThanOnePosition(getNameFromSearch) == false) {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
+                          var positionId = positionsData.data[0].positionsForWorker[0].id;
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionFromInstanceList.setValues(allPositionsForWorker);
+                          choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
+
+                          mirrorWorker.setValue(getAllWorkersInstanceList.value);
+                          mirrorPosition.setValue(arrayOfIdsPosition);
+
+                  } else {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionFromInstanceList.setValues(allPositionsForWorker);
+                          choosePositionFromInstanceList.setValue(arrayOfIdsPosition);
+                          mirrorWorker.setValue(getAllWorkersInstanceList.value);
+
+                          mirrorPosition.setValue(arrayOfIdsPosition);
+
+                  }
+          } else {
+              choosePositionFromInstanceList.visible = false;
+                  effectiveDate.visible = false;
+                  effectiveUntil.visible = false;
+                  justificationText.visible = false;
+                  getAllWorkersToInstanceList.setValue([]);
+                  choosePositionToInstanceList.setValue([]);
+                  getAllWorkersToInstanceList.visible = false;
+                  choosePositionToInstanceList.visible = false;
+          } %>"
+        },
+        {
+          "type": "text",
+          "id": "mirrorWorker",
+          "value": "<% getAllWorkersInstanceList.value %>",
+          "visible": false
+        },
+        {
+          "type": "instanceList",
+          "id": "choosePositionFromInstanceList",
+          "label": "Choose a position to mirror the security groups:",
+          "values": "<% var list = []; %>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "text",
+          "id": "mirrorPosition",
+          "value": "<% choosePositionFromInstanceList.value %>",
+          "visible": false
+        },
+        {
+          "type": "instanceList",
+          "id": "getAllWorkersToInstanceList",
+          "label": "Choose the target worker:",
+          "required": true,
+          "visible": false,
+          "values": "<% getAllWorkers.data %>",
+          "onChange": "<% if (!empty getAllWorkersToInstanceList.value == true) {
+              choosePositionToInstanceList.visible = true;
+                  var getNameFromSearch = getAllWorkersToInstanceList.selectedEntries[0].descriptor
+                  if(moreThanOnePosition(getNameFromSearch) == false) {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+                          var positionName = positionsData.data[0].positionsForWorker[0].descriptor;
+                          var positionId = positionsData.data[0].positionsForWorker[0].id;
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionToInstanceList.setValues(allPositionsForWorker);
+                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
+                          targetWorker.setValue(getAllWorkersToInstanceList.value);
+
+                          targetPosition.setValue(arrayOfIdsPosition);
+
+
+                  } else {
+                      var positionsData = getPositions.invoke({'fullName': getNameFromSearch})
+                          var allPositionsForWorker = positionsData.data[0].positionsForWorker
+
+                          var arrayOfIdsPosition = [];
+                          arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+
+                          choosePositionToInstanceList.setValues(allPositionsForWorker);
+                          choosePositionToInstanceList.setValue(arrayOfIdsPosition);
+                          targetWorker.setValue(getAllWorkersToInstanceList.value);
+
+                          targetPosition.setValue(arrayOfIdsPosition);
+
+                  }
+          } else {
+              choosePositionToInstanceList.visible = false;
+          } %>"
+        },
+        {
+          "type": "text",
+          "id": "targetWorker",
+          "value": "<% getAllWorkersToInstanceList.value %>",
+          "visible": false
+        },
+        {
+          "type": "instanceList",
+          "id": "choosePositionToInstanceList",
+          "label": "Choose a position to receive the new security groups:",
+          "values": "<% var list = []; %>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "text",
+          "id": "targetPosition",
+          "value": "<% choosePositionToInstanceList.value %>",
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveDate",
+          "label": "Effective Date",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "required": false,
+          "visible": false
+        },
+        {
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "required": false,
+          "visible": false
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Sony Security Process Automation v1.0"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "id": "updateCharityImage",
+  "endPoints": [
+    {
+      "name": "worker",
+      "baseUrlType": "workday-staffing",
+      "url": "workers/me",
+      "authType": "sso"
+    },
+    {
+      "name": "charity",
+      "baseUrlType": "app",
+      "url": "<% 'charities/' + queryParams.charityId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "charityImage",
+      "baseUrlType": "app",
+      "url": "<% 'charityImages/' + charity.image.id %>",
+      "exclude": "<% empty(charity.image) %>",
+      "authType": "sso"
+    },
+    {
+      "name": "charityImageMetadata",
+      "baseUrlType": "app",
+      "url": "<% 'charityImages/' + charity.image.id %>",
+      "exclude": "<% empty(charity.image) %>",
+      "authType": "sso",
+      "headers": [
+        {
+          "name": "Accept",
+          "value": "application/json"
+        }
+      ],
+      "_comment": "Get the Charity Image metadata by specifying the Accept header as JSON."
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "createCharityImage",
+        "baseUrlType": "app",
+        "url": "charityLogos",
+        "authType": "sso",
+        "httpMethod": "POST",
+        "multiPartFileLast": true,
+        "exclude": "<% (!(empty(charity.image))) %>",
+        "_comment": "Create a new Charity Image if one does not exist"
+      },
+      {
+        "name": "updateCharity",
+        "baseUrlType": "app",
+        "url": "<% 'charities/' + charity.id %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "exclude": "<% (!(empty(charity.image))) %>",
+        "values": [
+          {
+            "outboundPath": "image.id",
+            "value": "<% createCharityImage.id %>",
+            "_comment": "Set Charity Image relationship with ID returned by createCharityImage endpoint."
+          },
+          {
+            "outboundPath": "name",
+            "value": "<% charity.name %>"
+          },
+          {
+            "outboundPath": "description",
+            "value": "<% charity.description %>"
+          },
+          {
+            "outboundPath": "matchDonations",
+            "value": "<% charity.matchDonations %>"
+          },
+          {
+            "outboundPath": "relationshipManager.id",
+            "value": "<% charity.relationshipManager.id %>"
+          }
+        ],
+        "_comment": "Set the newly created Charity Image on the Charity since the relationship did not previously exist. We need to provide all existing values on the Charity so they do not fall off since this is a PUT."
+      },
+      {
+        "name": "updateCharityImage",
+        "baseUrlType": "app",
+        "url": "<% 'charityImages/' + charity.image.id %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "multiPartFileLast": true,
+        "exclude": "<% empty(charity.image) %>",
+        "_comment": "Update the existing Charity Image if one exists"
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "presentation": {
+    "title": {
+      "type": "title",
+      "label": "Update Charity Image"
+    },
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "title": "Charity",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name",
+          "value": "<% charity.name %>",
+          "enabled": "<% false %>"
+        },
+        {
+          "type": "section",
+          "horizontal": true,
+          "sorted": false,
+          "children": [
+            {
+              "type": "section",
+              "horizontal": false,
+              "sorted": false,
+              "children": [
+                {
+                  "type": "hidden",
+                  "value": "<% worker.id %>",
+                  "valueOutBinding": "<% empty(charity.image) ? 'createCharityImage:data:uploadedBy.id' : 'updateCharityImage:data:uploadedBy.id' %>"
+                },
+                {
+                  "type": "hidden",
+                  "value": "<% date:getTodaysDate(null) %>",
+                  "valueOutBinding": "<% empty(charity.image) ? 'createCharityImage:data:uploadedDate' : 'updateCharityImage:data:uploadedDate' %>"
+                },
+                {
+                  "type": "hidden",
+                  "value": "cid:image",
+                  "valueOutBinding": "<% empty(charity.image) ? 'createCharityImage:data:file' : 'updateCharityImage:data:file' %>"
+                },
+                {
+                  "type": "fileUploader",
+                  "id": "imageFileUploader",
+                  "label": "New Image",
+                  "singular": "<% true %>",
+                  "compact": "<% false %>",
+                  "required": "<% true %>",
+                  "fileTypes": "gif,jpg,jpeg,png",
+                  "valueOutBinding": "<% empty(charity.image) ? 'createCharityImage:image:' : 'updateCharityImage:image:' %>"
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "title": "Current Image",
+              "horizontal": false,
+              "sorted": false,
+              "children": [
+                {
+                  "type": "section",
+                  "id": "currentImageInfo",
+                  "horizontal": false,
+                  "sorted": false,
+                  "render": "<% (!(empty(charity.image))) %>",
+                  "children": [
+                    {
+                      "type": "image",
+                      "sizingHint": "INLINE",
+                      "id": "currentCharityImage",
+                      "endPoint": {
+                        "url": "charityImages/<% charity.image.id %>",
+                        "baseUrlType": "app",
+                        "authType": "sso"
+                      }
+                    },
+                    {
+                      "type": "text",
+                      "id": "uploadedBy",
+                      "label": "Uploaded By",
+                      "value": "<% charityImageMetadata.uploadedBy.descriptor %>",
+                      "enabled": "<% false %>"
+                    },
+                    {
+                      "type": "text",
+                      "label": "Uploaded Date",
+                      "id": "uploadedDate",
+                      "enabled": "<% false %>",
+                      "value": "<% charityImageMetadata.uploadedDate %>"
+                    },
+                    {
+                      "type": "text",
+                      "label": "File Size",
+                      "id": "fileSize",
+                      "value": "<% file:byteCountToDisplaySize(charityImageMetadata.fileLength) %>",
+                      "enabled": "<% false %>"
+                    }
+                  ]
+                },
+                {
+                  "type": "readOnlyText",
+                  "id": "noImageMessage",
+                  "value": "There is currently no image for this Charity.",
+                  "render": "<% empty(charity.image) %>"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

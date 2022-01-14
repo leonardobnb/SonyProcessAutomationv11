@@ -1,0 +1,28 @@
+{
+  "id": 1,
+  "name": "CharityImage",
+  "label": "Charity Image",
+  "defaultSecurityDomains": [
+    "ManageCharities"
+  ],
+  "defaultCollection": {
+    "name": "charityImages",
+    "label": "All Charity Images"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "uploadedBy",
+      "type": "SINGLE_INSTANCE",
+      "label": "Uploaded By",
+      "target": "WORKER"
+    },
+    {
+      "id": 2,
+      "name": "uploadedDate",
+      "type": "DATE",
+      "label": "Uploaded Date",
+      "precision": "DAY"
+    }
+  ]
+}

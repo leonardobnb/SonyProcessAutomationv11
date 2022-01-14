@@ -1,0 +1,198 @@
+{
+  "id": "createEvent",
+  "endPoints": [
+    {
+      "name": "worker",
+      "baseUrlType": "workday-staffing",
+      "url": "workers/me",
+      "authType": "sso"
+    },
+    {
+      "name": "workerSearch",
+      "baseUrlType": "workday-staffing",
+      "url": "<% 'workers?search=' + instanceListQuery %>",
+      "exclude": "<% empty(instanceListQuery) %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "outboundData": {
+    "_comment": "Remember that outbound endpoints fire in the order they are listed here. If any endpoints are dependent on any other endpoints they need to be listed after the endpoints they depend on.",
+    "outboundEndPoints": [
+      {
+        "name": "event",
+        "baseUrlType": "app",
+        "url": "events",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "_comment": "Outbound endpoint that submits the BO",
+        "values": [
+          {
+            "outboundPath": "createdBy.id",
+            "value": "<% worker.id %>"
+          },
+          {
+            "outboundPath": "image.id",
+            "value": "<% (!empty(createAnEventImage.id)) ? createAnEventImage.id : null %>"
+          }
+        ]
+      },
+      {
+        "_comment": "Kicks off BP. Pass in ID of the Event business object and when it is successfully created will trigger BP. Name element is the name of the BP in lower camel case + 'Events' from the .businessprocess file",
+        "name": "createEventEvents",
+        "baseUrlType": "app",
+        "url": "createEventEvents",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<%
+                   //Uncomment the below lines only for debugging purposes
+                   console.info(json:asJSON(self.data));
+                   return self.data;
+                   %>",
+        "values": [
+          {
+            "outboundPath": "businessProcessTarget.id",
+            "value": "<% event.id %>",
+            "_comment": "value above must match name of the outbound endpoint that submits the BO"
+          }
+        ]
+      }
+    ],
+    "responseErrorDetail": {
+      "errorSummary": "<% error %>",
+      "errors": "<% errors.map(item => { item.error }); %>"
+    }
+  },
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "title": {
+      "type": "title",
+      "label": "Workday Extend Create an Event"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": true,
+      "sorted": false,
+      "children": [
+        {
+          "type": "text",
+          "label": "Create an Event",
+          "value": "Complete the required information to create and submit an event.",
+          "enabled": false
+        },
+        {
+          "type": "section",
+          "children": [
+            {
+              "type": "text",
+              "label": "",
+              "value": "",
+              "enabled": false
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Name of Event",
+          "required": "<% true %>",
+          "valueOutBinding": "event.name"
+        },
+        {
+          "type": "text",
+          "id": "location",
+          "label": "Event Location",
+          "required": "<% true %>",
+          "valueOutBinding": "event.location"
+        },
+        {
+          "type": "text",
+          "id": "sponsor",
+          "label": "Event Sponsor",
+          "valueOutBinding": "event.sponsor",
+          "guide": {
+            "type": "guide",
+            "id": "guideName",
+            "title": "Sponsor Name",
+            "text": " Enter the Event Sponsors name:"
+          }
+        },
+        {
+          "type": "richText",
+          "id": "description",
+          "_comment": "this is a comment",
+          "label": "Description",
+          "required": "<% true %>",
+          "valueOutBinding": "event.description",
+          "validations": [
+            {
+              "regex": "^.{0,1000}",
+              "errorMessage": "Maximum character count (including markup) reached: 1000"
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "id": "date",
+          "label": "Date of Event",
+          "valueOutBinding": "event.date",
+          "required": true
+        },
+        {
+          "type": "text",
+          "id": "contactInfo",
+          "label": "Contact Info/Email",
+          "valueOutBinding": "event.contactInfo"
+        },
+        {
+          "type": "currency",
+          "currencyCode": "USD",
+          "id": "cost",
+          "label": "Fee (USD)",
+          "valuesOut": [
+            {
+              "value": "USD",
+              "valueOutBinding": "event.cost.currency"
+            },
+            {
+              "value": "<% cost.value %>",
+              "valueOutBinding": "event.cost.value"
+            }
+          ]
+        },
+        {
+          "type": "checkBox",
+          "id": "extendOnly",
+          "valueOutBinding": "event.extendOnly",
+          "trueLabel": "Yes",
+          "falseLabel": "No",
+          "label": "Is this a Workday Extend only event?"
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "richText",
+          "label": "",
+          "id": "richTextId6",
+          "value": "<p style=\"text-align:left\"><span style=\"font-size:11px; color:black;\">As per our Safe Harbor Statement, do not use what you may hear at an Extend Event to make any decisions.</span></p>",
+          "enabled": false
+        },
+        {
+          "type": "richText",
+          "label": "Left heading:",
+          "id": "richTextId1",
+          "value": "<p style=\"text-align:left\"><span style=\"font-size:14px; color:black;\"><b>Powered By Workday Extend App Components</b></h2>
+          ~ Model Components
+          ~ Presentation Components
+          ~ API Calls",
+          "enabled": false
+        }
+      ]
+    }
+  }
+}
