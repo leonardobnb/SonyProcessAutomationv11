@@ -1,0 +1,18 @@
+{
+  "id": 1,
+  "name": "CreateSecurityRequestv11",
+  "label": "Create Security Requestv11",
+  "description": "Business Process Type for Create Security Requestv11",
+  "targetBusinessObject": "SecurityRequestv11",
+  "allowsCancel": true,
+  "approvalStep": {
+    "actions": [
+      "APPROVE",
+      "DENY"
+    ],
+    "pageRoute": "/securityRequestv11Event/{eventId}"
+  },
+  "details": {
+    "pageRoute": "/securityRequestv11Event/{eventId}"
+  }
+}
