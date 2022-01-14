@@ -1,0 +1,27 @@
+{
+  "id": 2,
+  "name": "SRTargetv11",
+  "label": "SR Targetv11",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequestv11"
+  ],
+  "defaultCollection": {
+    "name": "sRTargetv11s",
+    "label": "SR Targetv11s"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "toWorker",
+      "label": "To Worker",
+      "type": "SINGLE_INSTANCE",
+      "target": "WORKER"
+    },
+    {
+      "id": 2,
+      "name": "toPosition",
+      "type": "SINGLE_INSTANCE",
+      "target": "POSITION"
+    }
+  ]
+}

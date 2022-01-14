@@ -1,0 +1,84 @@
+{
+  "id": "viewSecurityRequestv11Event",
+  "endPoints": [
+    {
+      "name": "event",
+      "baseUrlType": "workday-bp",
+      "httpMethod": "GET",
+      "url": "<% 'events/' + queryParams.eventId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "securityRequestv11",
+      "baseUrlType": "app",
+      "httpMethod": "GET",
+      "url": "<% 'securityRequestv11s/' + event.for.id %>",
+      "authType": "sso"
+    }
+  ],
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "title": {
+      "type": "title",
+      "label": "Security Requestv11 Details"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "instanceList",
+          "id": "fromWorker",
+          "label": "From Worker",
+          "instanceList": [
+            {
+              "id": "<% securityRequestv11.fromWorker.id %>",
+              "descriptor": "<% securityRequestv11.fromWorker.descriptor %>",
+              "wid": "<% securityRequestv11.fromWorker.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "fromPosition",
+          "label": "From Position",
+          "instanceList": [
+            {
+              "id": "<% securityRequestv11.fromPosition.id %>",
+              "descriptor": "<% securityRequestv11.fromPosition.descriptor %>",
+              "wid": "<% securityRequestv11.fromPosition.id %>"
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "id": "effectiveDate",
+          "label": "Effective Date",
+          "value": "<% securityRequestv11.effectiveDate %>"
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "value": "<% securityRequestv11.effectiveUntil %>"
+        },
+        {
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "value": "<% securityRequestv11.justificationText %>"
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}

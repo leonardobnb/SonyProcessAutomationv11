@@ -1,5 +1,5 @@
 {
-  "appProperties": [ ],
+  "appProperties": [],
   "flowDefinitions": [
     {
       "id": "createSecurityRequestFlow",
@@ -34,16 +34,23 @@
     },
     {
       "id": "CreateSecurityRequestv11",
-      "routingPattern": "CreateSecurityRequestv11",
+      "routingPattern": "/securityRequestv11s/create",
       "page": {
         "id": "CreateSecurityRequestv11"
       }
     },
     {
       "id": "manageSecurityRequestv11s",
-      "routingPattern": "manageSecurityRequestv11s",
+      "routingPattern": "/securityRequestv11s/manage",
       "page": {
         "id": "manageSecurityRequestv11s"
+      }
+    },
+    {
+      "id": "viewSecurityRequestv11Event",
+      "routingPattern": "/securityRequestv11Event/{eventId}",
+      "page": {
+        "id": "viewSecurityRequestv11Event"
       }
     }
   ],
@@ -56,6 +63,10 @@
     {
       "key": "workday",
       "value": "https://api.workday.com"
+    },
+    {
+      "key": "workday-bp",
+      "value": "https://api.workday.com/businessProcess/v1/"
     }
   ]
 }

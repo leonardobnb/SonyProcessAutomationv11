@@ -66,6 +66,21 @@
             "value": "<% toPosition.value[0] %>"
           }
         ]
+      },
+      {
+        "name": "createSecurityRequestv11Event",
+        "baseUrlType": "app",
+        "url": "createSecurityRequestv11Events",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data));
+                   return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "businessProcessTarget.id",
+            "value": "<% securityRequestv11.id %>"
+          }
+        ]
       }
     ]
   },
