@@ -10,7 +10,7 @@
       "APPROVE",
       "DENY"
     ],
-    "pageRoute": "/securityRequestv11Event/{eventId}"
+    "pageRoute": "/securityRequestv11Event/{eventStepId}"
   },
   "details": {
     "pageRoute": "/securityRequestv11Event/{eventId}"

@@ -1,0 +1,39 @@
+{
+  "id": 3,
+  "name": "SRAssignableRolesFromPositionv11",
+  "label": "SR Assignable Roles From Positionv11",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequestv11"
+  ],
+  "defaultCollection": {
+    "name": "sRAssignableRolesFromPositionv11s",
+    "label": "SR Assignable Roles From Positionv11s"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "referenceToSecurityRequestv11",
+      "label": "Reference to Security Requestv11",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequestv11"
+    },
+    {
+      "id": 2,
+      "name": "fromAssignableRolesForPositionName",
+      "label": "Assignable Role Name",
+      "type": "TEXT"
+    },
+    {
+      "id": 3,
+      "name": "fromAssignableRolesForPositionId",
+      "label": "Assignable Role Id",
+      "type": "TEXT"
+    },
+    {
+      "id": 4,
+      "name": "fromOrganizationId",
+      "label": "Organization Id",
+      "type": "TEXT"
+    }
+  ]
+}

@@ -2,15 +2,30 @@
   "id": "CreateSecurityRequestv11",
   "endPoints": [
     {
-      "name": "getAllWorkers",
-      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20as%20id%20FROM%20allWorkers",
+      "name": "getAllWorkersWithPositions",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty",
       "authType": "sso"
+    },
+    {
+      "name": "getUniquePosition",
+      "baseUrlType": "workday",
+      "url": "<% getUniquePositionQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
     },
     {
       "name": "getPositions",
       "baseUrlType": "workday",
       "url": "<% getPositionsQuery(fullName) %>",
       "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getAssignableRolesForPosition",
+      "baseUrlType": "workday",
+      "url": "<% getAssignableRolesForPositionQuery(positionId) %>",
       "authType": "sso",
       "deferred": "true"
     }
@@ -72,6 +87,21 @@
         ]
       },
       {
+
+        "name": "sRAssignableRolesFromPositionv11",
+        "baseUrlType": "app",
+        "url": "sRAssignableRolesFromPositionv11s",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "referenceToSecurityRequestv11.id",
+            "value": "<% securityRequestv11.id %>"
+          }
+        ]
+      },
+      {
         "name": "createSecurityRequestv11Event",
         "baseUrlType": "app",
         "url": "createSecurityRequestv11Events",
@@ -93,9 +123,16 @@
              var getPositionsQuery = function(searchTXT){
 
       var fullName = searchTXT;
-      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\'');
+      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty');
 
   };
+
+             var getUniquePositionQuery = function(searchTXT){
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND position is not empty')
+             }
+
+
 
              var moreThanOnePosition = function(workerName) {
                  var positionsData = getPositions.invoke({'fullName': workerName});
@@ -107,8 +144,22 @@
                  }
              };
 
+
+  var getAssignableRolesForPositionQuery = function(positionId){
+  return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT myAssignableRoles FROM allWorkers WHERE positionsForWorker=\\''+ positionId + '\\'')
+  }
+
+
              %>",
   "presentation": {
+    "applicationExceptions": [
+      {
+        "type": "applicationException",
+        "message": "ToPosition can't be the same from FromPosition. Please, choose another.",
+        "severity": "ERROR",
+        "render": "<%  %>"
+      }
+    ],
     "headerSize": "VPS_DEFAULT",
     "pageType": "edit",
     "title": {
@@ -125,7 +176,7 @@
           "id": "fromWorker",
           "label": "Search a worker to copy the security groups from:",
           "required": true,
-          "values": "<% getAllWorkers.data %>",
+          "values": "<% getAllWorkersWithPositions.data %>",
           "onChange": "<% if (!empty fromWorker.value == true) {
 
               fromPosition.visible = true;
@@ -134,16 +185,40 @@
                   justificationText.visible = true;
                   toWorker.visible= true;
 
+
           var getNameFromSearch = fromWorker.selectedEntries[0].descriptor;
 
               if(moreThanOnePosition(getNameFromSearch) == false) {
+
 
                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
                       var arrayOfIdsPosition = [];
                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                  fromPosition.setValues(allPositionsForWorker);
-                  fromPosition.setValue(arrayOfIdsPosition);
+                      fromPosition.setValues(allPositionsForWorker);
+                      fromPosition.setValue(arrayOfIdsPosition);
+
+                  var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value[0]});
+                      if(!empty assignableRoles.data) {
+                          var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
+                              fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
+
+                              fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
+                      }
+
+
+                  var positionData = getUniquePosition.invoke({'fullName': getNameFromSearch});
+                  var positionUnique = positionData.data[0].position;
+                      var arrayOfIdAndDescriptorUniquePosition = [];
+                      arrayOfIdAndDescriptorUniquePosition.add(positionUnique);
+                  var arrayOfIdUniquePosition = [];
+                      arrayOfIdUniquePosition.add(positionUnique.id);
+                      testepegarsouma.setValues(arrayOfIdAndDescriptorUniquePosition);
+                      testepegarsouma.setValue(arrayOfIdUniquePosition);
+                  testepegarsouma.visible = true;
+
+
+
               } else {
                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
@@ -151,6 +226,18 @@
                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
                   fromPosition.setValues(allPositionsForWorker);
                   fromPosition.setValue(arrayOfIdsPosition);
+
+
+
+                      var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value});
+                      if (!empty assignableRoles.data) {
+                          var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
+                              fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
+
+                              fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
+                      }
+
+
               }
           } else {
           fromPosition.visible = false;
@@ -161,6 +248,8 @@
               toPosition.setValue([]);
               toWorker.visible = false;
               toPosition.visible = false;
+              fromAssignableRolesForPositionNameGrid.setRows([]);
+              fromAssignableRolesForPositionNameGrid.visible = false;
           } %>"
         },
         {
@@ -177,7 +266,7 @@
           "label": "Choose the target worker:",
           "required": true,
           "visible": false,
-          "values": "<% getAllWorkers.data %>",
+          "values": "<% getAllWorkersWithPositions.data %>",
           "onChange": "<% if (!empty toWorker.value == true) {
               toPosition.visible = true;
           var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
@@ -187,8 +276,10 @@
                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
                       var arrayOfIdsPosition = [];
                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                  toPosition.setValues(allPositionsForWorker);
-                  toPosition.setValue(arrayOfIdsPosition);
+                      toPosition.setValues(allPositionsForWorker);
+                      toPosition.setValue(arrayOfIdsPosition);
+                  toPosition.clearError();
+
               } else {
                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
@@ -197,9 +288,12 @@
                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
                       toPosition.setValues(allPositionsForWorker);
                       toPosition.setValue(arrayOfIdsPosition);
+                      toPosition.clearError();
+
               }
           } else {
           toPosition.visible = false;
+              toPosition.clearError();
           } %>"
         },
         {
@@ -225,11 +319,62 @@
           "visible": false
         },
         {
-          "type": "text",
+          "type": "textArea",
           "id": "justificationText",
           "label": "Justification Text",
           "required": false,
           "visible": false
+        },
+        {
+          "type": "grid",
+          "id": "fromAssignableRolesForPositionNameGrid",
+          "label": "Assignable Roles for Position Selected",
+          "rows": "<% var list = []; %>",
+          "rowVariableName": "fromAssignableRolesForPosition",
+          "visible": false,
+          "columns": [
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% fromAssignableRolesForPosition.descriptor %>",
+                "valueOutBinding": "sRAssignableRolesFromPositionv11.fromAssignableRolesForPositionName"
+
+              },
+              "id": "fromAssignableRolesForPosition.descriptor",
+              "label": "From Assignable Roles For Position Name",
+              "columnId": "fromAssignableRolesForPositioName",
+              "type": "column"
+            },
+            {
+              "cellTemplate": {
+                "type": "text",
+                "value": "<% fromAssignableRolesForPosition.id %>",
+                "valueOutBinding": "sRAssignableRolesFromPositionv11.fromAssignableRolesForPositionId"
+              },
+              "id": "fromAssignableRolesForPosition.id",
+              "label": "From Assignable Roles For Position Id",
+              "columnId": "fromAssignableRolesForPosition",
+              "type": "column"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "testepegarsouma",
+          "label": "pegar só uma posição",
+          "values": "<% var list = []; %>",
+          "visible": false
+        },
+        {
+          "type": "editButtonBar",
+          "editButtons": [
+            {
+              "type": "editButton",
+              "label": "Submit",
+              "id": "submit",
+              "buttonType": "PRIMARY"
+            }
+          ]
         }
       ]
     },
@@ -239,9 +384,14 @@
         {
           "type": "richText",
           "enabled": "false",
-          "value": "Powered By Workday Extend"
+          "value": "Sony Process Automation v1.1"
         }
       ]
     }
-  }
+  },
+  "onSubmit": "<% if(fromPosition.value == toPosition.value) {
+      toPosition.setError('ToPosition can not be the same as From Position. Please, choose another.');
+  }else{
+  toPosition.clearError();
+  } %>"
 }

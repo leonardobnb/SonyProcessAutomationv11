@@ -98,6 +98,24 @@
           "id": "justificationText",
           "label": "Justification Text",
           "value": "<% securityRequestv11.justificationText %>"
+        },
+        {
+          "type": "text",
+          "id": "queryParametroEventId",
+          "label": "query param event id",
+          "value": "<%queryParams.eventId%>"
+        },
+        {
+          "type": "text",
+          "id": "eventforid",
+          "label": "event for id",
+          "value": "<%event.for.id%>"
+        },
+        {
+          "type": "text",
+          "id": "eventStepid",
+          "label": "event step id",
+          "value": "<%queryParams.eventStepId%>"
         }
       ]
     },

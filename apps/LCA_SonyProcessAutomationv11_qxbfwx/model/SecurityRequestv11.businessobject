@@ -22,7 +22,8 @@
       "name": "fromPosition",
       "label": "From Position",
       "type": "SINGLE_INSTANCE",
-      "target": "POSITION"
+      "target": "POSITION",
+      "secureByTarget": true
     },
     {
       "id": 3,
