@@ -3,5 +3,6 @@
   "referenceId" : "LCA_SonyProcessAutomationv11_qxbfwx",
   "name" : "LCA_SonyProcessAutomation11",
   "latestVersion" : "1c5b05079fd94f072b0711f19161b2d0",
-  "organizationId" : "3cac229b-8f73-4840-b65c-2ce13b21a00d"
+  "organizationId" : "3cac229b-8f73-4840-b65c-2ce13b21a00d",
+  "promotionLevel" : "DEVELOPMENT"
 }

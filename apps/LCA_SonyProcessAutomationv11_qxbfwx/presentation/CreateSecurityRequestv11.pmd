@@ -33,7 +33,6 @@
   "outboundData": {
     "outboundEndPoints": [
       {
-
         "name": "securityRequestv11",
         "baseUrlType": "app",
         "url": "securityRequestv11s",
@@ -64,7 +63,6 @@
         ]
       },
       {
-
         "name": "sRTargetv11",
         "baseUrlType": "app",
         "url": "sRTargetv11s",
@@ -87,7 +85,6 @@
         ]
       },
       {
-
         "name": "sRAssignableRolesFromPositionv11",
         "baseUrlType": "app",
         "url": "sRAssignableRolesFromPositionv11s",
@@ -338,7 +335,6 @@
                 "type": "text",
                 "value": "<% fromAssignableRolesForPosition.descriptor %>",
                 "valueOutBinding": "sRAssignableRolesFromPositionv11.fromAssignableRolesForPositionName"
-
               },
               "id": "fromAssignableRolesForPosition.descriptor",
               "label": "From Assignable Roles For Position Name",

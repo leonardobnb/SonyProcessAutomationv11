@@ -1,0 +1,856 @@
+{
+  "flowVersion": "1.15.0",
+  "name": "CreateOneTimePayment",
+  "type": ".Mixed.BusinessProcessTrigger",
+  "start": {
+    "parameters": [
+      {
+        "name": "employeeId",
+        "type": "String",
+        "expr": {
+          "expr": "s\"\"\"\"\"\"",
+          "_meta": {
+            "type": [
+              "Expr",
+              "String"
+            ]
+          }
+        }
+      },
+      {
+        "name": "amount",
+        "type": "Number",
+        "expr": {
+          "expr": "0",
+          "_meta": {
+            "type": [
+              "Expr",
+              "Number"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "end": { },
+  "notes": {
+    "value": [
+      {
+        "key": {
+          "value": "label",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "value": {
+          "value": "",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "_meta": {
+          "type": "Note"
+        }
+      },
+      {
+        "key": {
+          "value": "description",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "value": {
+          "value": "",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "_meta": {
+          "type": "Note"
+        }
+      }
+    ],
+    "_meta": {
+      "type": [
+        "List",
+        "Note"
+      ]
+    }
+  },
+  "startNotes": {
+    "value": [
+      {
+        "key": {
+          "value": "label",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "value": {
+          "value": "Flow Triggered",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "_meta": {
+          "type": "Note"
+        }
+      }
+    ],
+    "_meta": {
+      "type": [
+        "List",
+        "Note"
+      ]
+    }
+  },
+  "endNotes": {
+    "value": [
+      {
+        "key": {
+          "value": "label",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "value": {
+          "value": "Flow Finished",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "_meta": {
+          "type": "Note"
+        }
+      }
+    ],
+    "_meta": {
+      "type": [
+        "List",
+        "Note"
+      ]
+    }
+  },
+  "nodes": {
+    "value": [
+      {
+        "type": ".maya.Log",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "Log_1",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "Log_1",
+        "message": {
+          "expr": "s\"\"\"${data(\"start\", \"employeeId\")}${data(\"start\", \"amount\")}\"\"\"",
+          "_meta": {
+            "type": [
+              "Expr",
+              "String"
+            ]
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.SendWorkdayApiRequest",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "GetWorkerPositions",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "SendWorkdayAPIRequest",
+        "path": {
+          "expr": "s\"\"\"${\"compensation/v2/workers/Employee_ID=\"}${data(\"start\", \"employeeId\")}${\"/requestOneTimePayment/values/position\"}\"\"\"",
+          "_meta": {
+            "type": [
+              "Expr",
+              "String"
+            ]
+          }
+        },
+        "queryParams": [ ],
+        "method": {
+          "value": "GET",
+          "_meta": {
+            "type": "HttpMethod"
+          }
+        },
+        "headers": {
+          "value": [ ],
+          "_meta": {
+            "type": [
+              "List",
+              "Header"
+            ]
+          }
+        },
+        "auth": {
+          "resourceName": {
+            "value": "_DEFAULT_WORKDAY_CREDENTIAL",
+            "_meta": {
+              "type": "String"
+            }
+          },
+          "_meta": {
+            "type": "WorkdayCredentialRef"
+          }
+        },
+        "connectTimeoutMs": {
+          "value": 10000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "responseTimeoutMs": {
+          "value": 20000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "overallTimeoutMs": {
+          "value": 300000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "maxRetries": {
+          "value": 0,
+          "_meta": {
+            "type": "Int"
+          }
+        },
+        "retryDelayMs": {
+          "value": 1000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "responseType": {
+          "value": "Any",
+          "_meta": {
+            "type": "HttpResponseType"
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.TreatAsJson",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "ParseGetWorkerPositions",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "TreatasJSON_1",
+        "data": {
+          "expr": "data(\"SendWorkdayAPIRequest\", \"response\")",
+          "_meta": {
+            "type": [
+              "Expr",
+              "Data"
+            ]
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.CreateValues",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "SetPositionID",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "CreateValues_1",
+        "values": [
+          {
+            "param": {
+              "description": "",
+              "name": "positionId",
+              "type": "String"
+            },
+            "expr": {
+              "expr": "data(\"TreatasJSON_1\", \"json\").stringAtJsonPath(\"$.data[0].id\")",
+              "_meta": {
+                "type": [
+                  "Expr",
+                  "String"
+                ]
+              }
+            },
+            "type": "String",
+            "id": "7cBRLI0h"
+          }
+        ],
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.CreateJson",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "CreateOneTimePaymentRequestBody",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "CreateJSON",
+        "structure": "d5e60a09-bb1b-4731-845c-1111183f21dc",
+        "values": {
+          "value": [
+            {
+              "path": {
+                "value": "$.effectiveDate",
+                "_meta": {
+                  "type": "JsonPath"
+                }
+              },
+              "expr": {
+                "expr": "date.now().format(\"yyyy-MM-dd\")",
+                "_meta": {
+                  "type": [
+                    "Expr",
+                    "String"
+                  ]
+                }
+              },
+              "_meta": {
+                "type": "Mapping"
+              }
+            },
+            {
+              "path": {
+                "value": "$.position.id",
+                "_meta": {
+                  "type": "JsonPath"
+                }
+              },
+              "expr": {
+                "expr": "data(\"CreateValues_1\", \"positionId\")",
+                "_meta": {
+                  "type": [
+                    "Expr",
+                    "String"
+                  ]
+                }
+              },
+              "_meta": {
+                "type": "Mapping"
+              }
+            },
+            {
+              "path": {
+                "value": "$.oneTimePayments[0].paymentAmount.value",
+                "_meta": {
+                  "type": "JsonPath"
+                }
+              },
+              "expr": {
+                "expr": "data(\"start\", \"amount\")",
+                "_meta": {
+                  "type": [
+                    "Expr",
+                    "Number"
+                  ]
+                }
+              },
+              "_meta": {
+                "type": "Mapping"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Mapping"
+            ]
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.Log",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "LogOneTimePaymentRequestBody",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "Log",
+        "message": {
+          "expr": "data(\"CreateJSON\", \"data\").toString()",
+          "_meta": {
+            "type": [
+              "Expr",
+              "String"
+            ]
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      },
+      {
+        "type": ".maya.SendWorkdayApiRequest",
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "label",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "CreateOneTimePayment",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "name": "SendWorkdayAPIRequest_1",
+        "body": {
+          "message": {
+            "expr": "data(\"CreateJSON\", \"data\").toString()",
+            "_meta": {
+              "type": [
+                "Expr",
+                "String"
+              ]
+            }
+          },
+          "contentType": "application/json",
+          "_meta": {
+            "type": "CreateTextDataBody"
+          }
+        },
+        "path": {
+          "expr": "s\"\"\"${\"/compensation/v2/workers/Employee_ID=\"}${data(\"start\", \"employeeId\")}${\"/requestOneTimePayment\"}\"\"\"",
+          "_meta": {
+            "type": [
+              "Expr",
+              "String"
+            ]
+          }
+        },
+        "queryParams": [ ],
+        "method": "POST",
+        "headers": {
+          "value": [ ],
+          "_meta": {
+            "type": [
+              "List",
+              "Header"
+            ]
+          }
+        },
+        "auth": {
+          "resourceName": {
+            "value": "_DEFAULT_WORKDAY_CREDENTIAL",
+            "_meta": {
+              "type": "String"
+            }
+          },
+          "_meta": {
+            "type": "WorkdayCredentialRef"
+          }
+        },
+        "connectTimeoutMs": {
+          "value": 10000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "responseTimeoutMs": {
+          "value": 20000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "overallTimeoutMs": {
+          "value": 300000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "maxRetries": {
+          "value": 0,
+          "_meta": {
+            "type": "Int"
+          }
+        },
+        "retryDelayMs": {
+          "value": 1000,
+          "_meta": {
+            "type": "Long"
+          }
+        },
+        "responseType": {
+          "value": "Any",
+          "_meta": {
+            "type": "HttpResponseType"
+          }
+        },
+        "_meta": {
+          "type": "Node"
+        }
+      }
+    ],
+    "_meta": {
+      "type": [
+        "List",
+        "Node"
+      ]
+    }
+  },
+  "resources": {
+    "fileLikeResources": {
+      "d5e60a09-bb1b-4731-845c-1111183f21dc": {
+        "name": {
+          "value": "d5e60a09-bb1b-4731-845c-1111183f21dc",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "content": {
+          "value": "{\"effectiveDate\":\"@PLACEHOLDER@\",\"position\":{\"id\":\"@PLACEHOLDER@\"},\"oneTimePayments\":[{\"paymentAmount\":{\"value\":0},\"paymentCurrency\":{\"id\":\"Currency_ID=USD\"},\"oneTimePaymentPlan\":{\"id\":\"One-Time_Payment_Plan_ID=SPOT_BONUS\"},\"sendToPayroll\":true}]}",
+          "_meta": {
+            "type": "String"
+          }
+        },
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "content-type",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "application/json",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            },
+            {
+              "key": {
+                "value": "resource-type",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "SCHEMA",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            },
+            {
+              "key": {
+                "value": "resource-display-name",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "d5e60a09-bb1b-4731-845c-1111183f21dc",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "_meta": {
+          "type": "InlineResource"
+        }
+      },
+      "_meta": {
+        "type": [
+          "Map",
+          "Resource"
+        ]
+      }
+    },
+    "credentials": {
+      "_meta": {
+        "type": [
+          "Map",
+          [
+            "WithNotes",
+            "ExternalAuth"
+          ]
+        ]
+      }
+    },
+    "workdayCredentials": {
+      "aIrPY3jF": {
+        "value": {
+          "username": {
+            "expr": "\"ISU_TuitionReimbursement\"",
+            "_meta": {
+              "type": [
+                "Expr",
+                "String"
+              ]
+            }
+          },
+          "checkEnvironment": {
+            "value": false,
+            "_meta": {
+              "type": "Boolean"
+            }
+          },
+          "_meta": {
+            "type": "IntegrationSystemUser"
+          }
+        },
+        "notes": {
+          "value": [
+            {
+              "key": {
+                "value": "resource-type",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "AUTH",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            },
+            {
+              "key": {
+                "value": "resource-display-name",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "value": {
+                "value": "ISU",
+                "_meta": {
+                  "type": "String"
+                }
+              },
+              "_meta": {
+                "type": "Note"
+              }
+            }
+          ],
+          "_meta": {
+            "type": [
+              "List",
+              "Note"
+            ]
+          }
+        },
+        "_meta": {
+          "type": [
+            "WithNotes",
+            "WorkdayCredential"
+          ]
+        }
+      },
+      "_meta": {
+        "type": [
+          "Map",
+          [
+            "WithNotes",
+            "WorkdayCredential"
+          ]
+        ]
+      }
+    },
+    "_meta": {
+      "type": "ResourceProvider"
+    }
+  },
+  "defaultWorkdayCredentialRef": {
+    "resourceName": {
+      "value": "aIrPY3jF",
+      "_meta": {
+        "type": "String"
+      }
+    },
+    "_meta": {
+      "type": [
+        "Opt",
+        "WorkdayCredentialRef"
+      ]
+    }
+  },
+  "_meta": {
+    "type": "Flow"
+  }
+}

@@ -9,8 +9,8 @@
   "siteAuth": {
     "authTypes": [
       {
-        "id": "sso",
-        "scheme": "SSO"
+        "scheme": "SSO",
+        "id": "sso"
       }
     ]
   },

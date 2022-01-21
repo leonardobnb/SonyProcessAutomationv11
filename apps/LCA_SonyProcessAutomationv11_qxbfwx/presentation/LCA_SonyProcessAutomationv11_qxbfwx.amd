@@ -1,7 +1,5 @@
 {
-  "appProperties": [],
-  "flowDefinitions": [
-  ],
+  "appProperties": [ ],
   "tasks": [
     {
       "id": "root",

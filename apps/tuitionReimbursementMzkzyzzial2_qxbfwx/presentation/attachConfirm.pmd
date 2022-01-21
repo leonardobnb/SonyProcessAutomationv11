@@ -1,0 +1,29 @@
+{
+  "id": "attachConfirm",
+  "endPoints": [ ],
+  "presentation": {
+    "headerSize": "STANDARD",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "text",
+          "id": "hello",
+          "label": "Success!",
+          "value": "<% json:asJSON(flowVariables.result) %>"
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Extend"
+        }
+      ]
+    }
+  }
+}
