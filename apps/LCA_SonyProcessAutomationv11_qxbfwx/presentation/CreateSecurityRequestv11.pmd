@@ -33,6 +33,15 @@
   "outboundData": {
     "outboundEndPoints": [
       {
+        "values" : [ {
+                       "outboundPath" : "submitted",
+                       "value" : true
+                     } ],
+        "name" : "transitionOutboundVars",
+        "type" : "outboundVariable",
+        "variableScope" : "flow"
+      },
+      {
         "name": "securityRequestv11",
         "baseUrlType": "app",
         "url": "securityRequestv11s",
@@ -175,7 +184,6 @@
           "required": true,
           "values": "<% getAllWorkersWithPositions.data %>",
           "onChange": "<% if (!empty fromWorker.value == true) {
-
               fromPosition.visible = true;
                   effectiveDate.visible = true;
                   effectiveUntil.visible = true;
@@ -359,7 +367,7 @@
           "id": "testepegarsouma",
           "label": "pegar só uma posição",
           "values": "<% var list = []; %>",
-          "visible": false
+          "visible": true
         },
         {
           "type": "editButtonBar",

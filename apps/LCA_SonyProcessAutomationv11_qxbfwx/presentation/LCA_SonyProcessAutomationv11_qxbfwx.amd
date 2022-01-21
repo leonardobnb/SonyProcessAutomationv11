@@ -1,11 +1,42 @@
 {
   "appProperties": [ ],
+  "flowDefinitions": [
+    {
+      "id": "selfRefPopup",
+      "name": "selfRefPopup",
+      "flowSteps": [
+        {
+          "id": "selfRefPopup",
+          "transitions": [
+            {
+              "id": "selfPop",
+              "value": "selfPop",
+              "order": "a",
+              "condition": "true"
+            }
+          ],
+          "taskId": "CreateSecurityRequestv11"
+        },
+        {
+          "id": "selfPop",
+          "taskId": "home"
+        }
+      ]
+    }
+  ],
   "tasks": [
     {
       "id": "root",
       "routingPattern": "/",
       "page": {
         "id": "CreateSecurityRequestv11"
+      }
+    },
+    {
+      "id": "home",
+      "routingPattern": "/home",
+      "page": {
+        "id": "home"
       }
     },
     {

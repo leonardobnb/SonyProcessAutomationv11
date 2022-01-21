@@ -1,5 +1,18 @@
 {
   "id": "home",
+  "outboundData":{
+    "outboundEndPoints":[
+      {
+        "values" : [ {
+                       "outboundPath" : "submitted",
+                       "value" : false
+                     } ],
+        "name" : "transitionOutboundVars",
+        "type" : "outboundVariable",
+        "variableScope" : "flow"
+      }
+    ]
+  },
   "presentation": {
     "title": {
       "type": "title",
@@ -8,6 +21,15 @@
     "body": {
       "type": "section",
       "children": [
+        {
+          "type" : "congratulationsPopup",
+          "id":"congratsPopUp",
+          "render" : "<%
+                      flowVariables.submitted ?? false
+                      %>",
+          "textCongrats" : "Submission completed!",
+          "textSubmitted" : ""
+        },
         {
           "type": "button",
           "id": "createNewSecurityRequestv11",
