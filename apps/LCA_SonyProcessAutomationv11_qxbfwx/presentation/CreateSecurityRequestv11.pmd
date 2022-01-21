@@ -3,7 +3,7 @@
   "endPoints": [
     {
       "name": "getAllWorkersWithPositions",
-      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
       "authType": "sso"
     },
     {
@@ -123,7 +123,7 @@
              var getPositionsQuery = function(searchTXT){
 
       var fullName = searchTXT;
-      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty');
+      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
 
   };
 
