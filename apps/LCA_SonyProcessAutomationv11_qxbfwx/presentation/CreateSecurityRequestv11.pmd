@@ -39,7 +39,8 @@
                      } ],
         "name" : "transitionOutboundVars",
         "type" : "outboundVariable",
-        "variableScope" : "flow"
+        "variableScope" : "flow",
+        "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
       },
       {
         "name": "securityRequestv11",
@@ -178,12 +179,29 @@
       "horizontal": false,
       "children": [
         {
+          "type" : "congratulationsPopup",
+          "id":"congratsPopUp",
+          "textCongrats" : "Submission completed!",
+          "textSubmitted" : "",
+          "render": "<% flowVariables.submitted ?? false %>",
+          "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
+
+        },
+        {
           "type": "instanceList",
           "id": "fromWorker",
-          "label": "Search a worker to copy the security groups from:",
+          "label": "Select a worker to copy the security from:",
           "required": true,
           "values": "<% getAllWorkersWithPositions.data %>",
-          "onChange": "<% if (!empty fromWorker.value == true) {
+          "onChange": "<%
+                        /* Se comprueba si el popup es accesible, y de ser el caso,
+                         se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
+                       if(!empty congratsPopUp){
+                          congratsPopUp.visible=false;
+                       }
+
+
+                       if (!empty fromWorker.value == true) {
               fromPosition.visible = true;
                   effectiveDate.visible = true;
                   effectiveUntil.visible = true;
@@ -218,9 +236,7 @@
                       arrayOfIdAndDescriptorUniquePosition.add(positionUnique);
                   var arrayOfIdUniquePosition = [];
                       arrayOfIdUniquePosition.add(positionUnique.id);
-                      testepegarsouma.setValues(arrayOfIdAndDescriptorUniquePosition);
-                      testepegarsouma.setValue(arrayOfIdUniquePosition);
-                  testepegarsouma.visible = true;
+
 
 
 
@@ -255,7 +271,7 @@
               toPosition.visible = false;
               fromAssignableRolesForPositionNameGrid.setRows([]);
               fromAssignableRolesForPositionNameGrid.visible = false;
-          } %>"
+          }%>"
         },
         {
           "type": "instanceList",
@@ -272,7 +288,8 @@
           "required": true,
           "visible": false,
           "values": "<% getAllWorkersWithPositions.data %>",
-          "onChange": "<% if (!empty toWorker.value == true) {
+          "onChange": "<%
+                       if (!empty toWorker.value == true) {
               toPosition.visible = true;
           var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
 
@@ -299,7 +316,7 @@
           } else {
           toPosition.visible = false;
               toPosition.clearError();
-          } %>"
+          }%>"
         },
         {
           "type": "instanceList",
@@ -363,13 +380,6 @@
           ]
         },
         {
-          "type": "instanceList",
-          "id": "testepegarsouma",
-          "label": "pegar só uma posição",
-          "values": "<% var list = []; %>",
-          "visible": true
-        },
-        {
           "type": "editButtonBar",
           "editButtons": [
             {
@@ -385,11 +395,6 @@
     "footer": {
       "type": "footer",
       "children": [
-        {
-          "type": "richText",
-          "enabled": "false",
-          "value": "Sony Process Automation v1.1"
-        }
       ]
     }
   },
