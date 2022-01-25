@@ -1,5 +1,5 @@
 {
-  "appProperties": [ ],
+  "appProperties": [],
   "flowDefinitions": [
     {
       "id": "selfRefPopup",
@@ -58,6 +58,14 @@
       "routingPattern": "/securityRequestv11Event/{eventId}",
       "page": {
         "id": "viewSecurityRequestv11Event"
+      }
+    },
+    {
+      "_comment": "task que referencia a la pagina ViewSecurityRequest, la cual seleccionar un security request para verlo en detalle.",
+      "id": "ViewSecurityRequest",
+      "routingPattern": "/ViewSecurityRequest",
+      "page": {
+        "id": "ViewSecurityRequest"
       }
     }
   ],

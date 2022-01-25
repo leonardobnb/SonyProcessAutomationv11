@@ -1,0 +1,156 @@
+{
+  "id": "ViewSecurityRequest",
+  "endPoints": [
+    {
+      "_comment": "Endpoint que devuelve todos los Security Request creados",
+      "name": "securityRequestv11s",
+      "baseUrlType": "app",
+      "url": "securityRequestv11s",
+      "authType": "sso",
+      "isCollection": "true"
+    },
+    {
+      "_comment": "Endpoint que devuelve todos los Security Request Targets creados",
+      "name": "sRTargetv11s",
+      "baseUrlType": "app",
+      "url": "sRTargetv11s",
+      "authType": "sso",
+      "isCollection": "true"
+    },
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequestv11s' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    },
+    {
+      "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
+      "name": "getTById",
+      "baseUrlType": "app",
+      "url": "<% 'sRTargetv11s' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    }
+
+  ],
+  "outboundData": {
+    "outboundEndPoints": [ ]
+  },
+  "script": "<%
+  //Función que rellena los campos con los datos del security request seleccionado por el usuario.
+             var populate = function(id) {
+                 if( !(empty id)) {
+                     var TRequest = getTById.invoke({'id': id});
+                         var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                         fromWorkerText.value = SRequest.fromWorker.descriptor;
+                         fromPositionText.value = SRequest.fromPosition.descriptor;
+                         toWorkerText.value = TRequest.toWorker.descriptor;
+                         toPositionText.value = TRequest.toPosition.descriptor;
+                         effectiveDateText.value = date:parse(SRequest.effectiveDate, 'yyyy-MM-dd');
+                         effectiveUntilText.value = date:parse(SRequest.effectiveUntil, 'yyyy-MM-dd');
+                         justificationText.value = SRequest.justificationText;
+                 }
+                     else {
+                     fromWorkerText.value = '';
+                         fromPositionText.value = '';
+                         toWorkerText.value = '';
+                         toPositionText.value = '';
+                         effectiveDateText.value = '';
+                         effectiveUntilText.value = '';
+                         justificationText = ''
+                 }
+             };
+             %>",
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "View Security Requestv11s",
+      "enabled": true
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "_comment": "instancelist para que el usuario seleccione el security request cuyos datos quiere ver",
+          "type": "instanceList",
+          "id": "srSelection",
+          "label": "Security Request",
+          "values": "<% sRTargetv11s.data %>",
+          "onChange":"<% populate(self.value[0]) %>"
+        },
+        {
+          "_comment": "Se rellena con el dato from worker del security request",
+          "type": "text",
+          "label": "From worker",
+          "id": "fromWorkerText",
+          "enabled":"false",
+          "value": " "
+        },
+        {
+          "_comment": "Se rellena con el dato to worker del security request",
+          "type": "text",
+          "label": "To worker",
+          "id": "toWorkerText",
+          "enabled":"false",
+          "value": " "
+        },
+        {
+          "_comment": "Se rellena con el dato to position del security request",
+          "type": "text",
+          "label": "To position",
+          "id": "toPositionText",
+          "enabled":"false",
+          "value": " "
+        },
+        {
+          "_comment": "Se rellena con el dato from position del security request",
+          "type": "text",
+          "id":"fromPositionText",
+          "label": "From Position",
+          "enabled":"false",
+          "value": " "
+        },
+        {
+          "_comment": "Se rellena con el dato  effective date del security request",
+          "type": "date",
+          "id":"effectiveDateText",
+          "datePrecision": "DAY",
+          "label":"Effective date",
+          "dateFormat": "yyyy-MM-dd",
+          "value": " ",
+          "enabled":"false"
+        },
+
+        {
+          "_comment": "Se rellena con el dato effective until del security request",
+          "type": "date",
+          "id":"effectiveUntilText",
+          "label":"Effective Until",
+          "datePrecision": "DAY",
+          "enabled":"false",
+          "dateFormat": "yyyy-MM-dd",
+          "value": " "
+        },
+        {
+          "_comment": "Se rellena con el dato justification text del security request",
+          "type": "text",
+          "id":"justificationText",
+          "label":"Justification Text",
+          "enabled":"false",
+          "value": " "
+        }
+      ]
+    }
+  },
+  "footer": {
+    "type": "footer",
+    "children": [
+
+    ]
+  }
+}
