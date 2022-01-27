@@ -40,6 +40,13 @@
   },
   "script": "<%
   //Función que rellena los campos con los datos del security request seleccionado por el usuario.
+             var valuesList = function(){
+                 var namesList = [];
+                 for(var Target : sRTargetv11s.data){
+                     var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequestv11.id});
+                     namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + date:parse(SRequest.effectiveDate, 'yyyy-MM-dd')});
+                 }
+             }
              var populate = function(id) {
                  if( !(empty id)) {
                      var TRequest = getTById.invoke({'id': id});
@@ -59,7 +66,7 @@
                          toPositionText.value = '';
                          effectiveDateText.value = '';
                          effectiveUntilText.value = '';
-                         justificationText = ''
+                         justificationText.value = '';
                  }
              };
              %>",
@@ -80,8 +87,14 @@
           "type": "instanceList",
           "id": "srSelection",
           "label": "Security Request",
-          "values": "<% sRTargetv11s.data %>",
-          "onChange":"<% populate(self.value[0]) %>"
+          "values": "<% pageVariables.namesList %>",
+          "onChange":"<%
+                      if(!empty self.value[0]){
+                          populate(self.value[0]);
+                      }else{
+                          populate(null);
+                      }
+                       %>"
         },
         {
           "_comment": "Se rellena con el dato from worker del security request",
@@ -147,6 +160,13 @@
       ]
     }
   },
+  "onLoad":"<%
+            pageVariables.namesList = [];
+            for(var Target : sRTargetv11s.data){
+                var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequestv11.id});
+                    pageVariables.namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + date:parse(SRequest.effectiveDate, 'yyyy-MM-dd')});
+            }
+            %>",
   "footer": {
     "type": "footer",
     "children": [

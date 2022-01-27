@@ -67,6 +67,13 @@
       "page": {
         "id": "ViewSecurityRequest"
       }
+    },
+    {
+      "id": "viewSecurityRequestMicro",
+      "routingPattern": "viewSecurityRequestMicro",
+      "page": {
+        "id": "viewSecurityRequestMicro"
+      }
     }
   ],
   "applicationId": "LCA_SonyProcessAutomationv11_qxbfwx",
