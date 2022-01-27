@@ -1,0 +1,65 @@
+{
+  "appProperties": [],
+  "flowDefinitions": [
+    {
+      "id": "selfRefPopup",
+      "name": "selfRefPopup",
+      "flowSteps": [
+        {
+          "id": "selfRefPopup",
+          "transitions": [
+            {
+              "id": "selfPop",
+              "value": "selfPop",
+              "order": "a",
+              "condition": "true"
+            }
+          ],
+          "taskId": "CreateSecurityRequest"
+        },
+        {
+          "id": "selfPop",
+          "taskId": "CreateSecurityRequest"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "root",
+      "routingPattern": "/",
+      "page": {
+        "id": "CreateSecurityRequest"
+      }
+    },
+    {
+      "id": "CreateSecurityRequest",
+      "routingPattern": "/securityRequests/create",
+      "page": {
+        "id": "CreateSecurityRequest"
+      }
+    },
+    {
+      "id": "viewSecurityRequestEvent",
+      "routingPattern": "/securityRequestEvent/{eventId}",
+      "page": {
+        "id": "viewSecurityRequestEvent"
+      }
+    }
+  ],
+  "applicationId": "SecurityRequestAutomation_gwmphd",
+  "dataProviders": [
+    {
+      "key": "app",
+      "value": "https://api.workday.com/apps/<% site.applicationId %>/v1/"
+    },
+    {
+      "key": "workday",
+      "value": "https://api.workday.com"
+    },
+    {
+      "key": "workday-bp",
+      "value": "https://api.workday.com/businessProcess/v1/"
+    }
+  ]
+}

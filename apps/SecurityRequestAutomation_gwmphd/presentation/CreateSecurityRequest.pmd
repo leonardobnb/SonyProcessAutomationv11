@@ -1,0 +1,333 @@
+{
+  "id": "CreateSecurityRequest",
+  "endPoints": [
+    {
+      "name": "getAllWorkersWithPositions",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
+      "authType": "sso"
+    },
+    {
+      "name": "getUniquePosition",
+      "baseUrlType": "workday",
+      "url": "<% getUniquePositionQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    },
+    {
+      "name": "getPositions",
+      "baseUrlType": "workday",
+      "url": "<% getPositionsQuery(fullName) %>",
+      "exclude": "<% empty instanceListQuery %>",
+      "authType": "sso",
+      "deferred": "true"
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "values" : [ {
+                       "outboundPath" : "submitted",
+                       "value" : true
+                     } ],
+        "name" : "transitionOutboundVars",
+        "type" : "outboundVariable",
+        "variableScope" : "flow",
+        "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
+      },
+      {
+        "name": "securityRequest",
+        "baseUrlType": "app",
+        "url": "securityRequests",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "fromWorker.id",
+            "value": "<% fromWorker.value[0] %>"
+          },
+          {
+            "outboundPath": "fromPosition.id",
+            "value": "<% fromPosition.value[0] %>"
+          },
+          {
+            "outboundPath": "effectiveDate",
+            "value": "<% effectiveDate.value %>"
+          },
+          {
+            "outboundPath": "effectiveUntil",
+            "value": "<% effectiveUntil.value %>"
+          },
+          {
+            "outboundPath": "justificationText",
+            "value": "<% justificationText.value %>"
+          }
+        ]
+      },
+      {
+        "name": "sRTarget",
+        "baseUrlType": "app",
+        "url": "sRTargets",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data)); return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "toWorker.id",
+            "value": "<% toWorker.value[0] %>"
+          },
+          {
+            "outboundPath": "toPosition.id",
+            "value": "<% toPosition.value[0] %>"
+          },
+          {
+            "outboundPath": "referenceToSecurityRequest.id",
+            "value": "<% securityRequest.id %>"
+          }
+        ]
+      },
+      {
+        "name": "createSecurityRequestEvent",
+        "baseUrlType": "app",
+        "url": "createSecurityRequestEvents",
+        "httpMethod": "POST",
+        "authType": "sso",
+        "onSend": "<% console.info(json:asJSON(self.data));
+        return self.data; %>",
+        "values": [
+          {
+            "outboundPath": "businessProcessTarget.id",
+            "value": "<% securityRequest.id %>"
+          }
+        ]
+      }
+    ]
+  },
+  "script": "<%
+
+             var getPositionsQuery = function(searchTXT){
+
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
+
+             };
+
+             var getUniquePositionQuery = function(searchTXT){
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND position is not empty')
+             }
+
+
+
+             var moreThanOnePosition = function(workerName) {
+                 var positionsData = getPositions.invoke({'fullName': workerName});
+                 var listSize = positionsData.data[0].positionsForWorker;
+                 if(listSize.size() > 1) {
+                     return true
+                 } else {
+                     return false
+                 }
+             };
+
+
+             %>",
+  "presentation": {
+    "applicationExceptions": [
+      {
+        "type": "applicationException",
+        "message": "ToPosition can't be the same from FromPosition. Please, choose another.",
+        "severity": "ERROR",
+        "render": "<%  %>"
+      }
+    ],
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "edit",
+    "title": {
+      "type": "title",
+      "label": "Create New Security Request",
+      "enabled": true
+    },
+    "body": {
+      "type": "fieldSet",
+      "horizontal": false,
+      "children": [
+        {
+          "type" : "congratulationsPopup",
+          "id":"congratsPopUp",
+          "textCongrats" : "Submission completed!",
+          "textSubmitted" : "",
+          "render": "<% flowVariables.submitted ?? false %>",
+          "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
+
+        },
+        {
+          "type": "instanceList",
+          "id": "fromWorker",
+          "label": "Select a worker to copy the security from:",
+          "required": true,
+          "values": "<% getAllWorkersWithPositions.data %>",
+          "onChange": "<%
+                       /* Se comprueba si el popup es accesible, y de ser el caso,
+                        se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
+                       if(!empty congratsPopUp){
+                           congratsPopUp.visible=false;
+                       }
+
+
+                       if (!empty fromWorker.value == true) {
+                           fromPosition.visible = true;
+                               effectiveDate.visible = true;
+                               effectiveUntil.visible = true;
+                               justificationText.visible = true;
+                               toWorker.visible= true;
+
+
+                               var getNameFromSearch = fromWorker.selectedEntries[0].descriptor;
+
+                               if(moreThanOnePosition(getNameFromSearch) == false) {
+
+
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       fromPosition.setValues(allPositionsForWorker);
+                                       fromPosition.setValue(arrayOfIdsPosition);
+
+
+
+                                       var positionData = getUniquePosition.invoke({'fullName': getNameFromSearch});
+                                       var positionUnique = positionData.data[0].position;
+                                       var arrayOfIdAndDescriptorUniquePosition = [];
+                                       arrayOfIdAndDescriptorUniquePosition.add(positionUnique);
+                                       var arrayOfIdUniquePosition = [];
+                                       arrayOfIdUniquePosition.add(positionUnique.id);
+
+
+
+
+                               } else {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       fromPosition.setValues(allPositionsForWorker);
+                                       fromPosition.setValue(arrayOfIdsPosition);
+
+
+
+
+
+
+                               }
+                       } else {
+                           fromPosition.visible = false;
+                               effectiveDate.visible = false;
+                               effectiveUntil.visible = false;
+                               justificationText.visible = false;
+                               toWorker.setValue([]);
+                               toPosition.setValue([]);
+                               toWorker.visible = false;
+                               toPosition.visible = false;
+                       }%>"
+        },
+        {
+          "type": "instanceList",
+          "id": "fromPosition",
+          "label": "Choose a position to mirror the security groups:",
+          "values": "<%var list = []%>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "instanceList",
+          "id": "toWorker",
+          "label": "Choose the target worker:",
+          "required": true,
+          "visible": false,
+          "values": "<% getAllWorkersWithPositions.data %>",
+          "onChange": "<%
+                       if (!empty toWorker.value == true) {
+                           toPosition.visible = true;
+                               var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
+
+                               if(moreThanOnePosition(getNameFromSearch) == false) {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       toPosition.setValues(allPositionsForWorker);
+                                       toPosition.setValue(arrayOfIdsPosition);
+                                       toPosition.clearError();
+
+                               } else {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       toPosition.setValues(allPositionsForWorker);
+                                       toPosition.setValue(arrayOfIdsPosition);
+                                       toPosition.clearError();
+
+                               }
+                       } else {
+                           toPosition.visible = false;
+                               toPosition.clearError();
+                       }%>"
+        },
+        {
+          "type": "instanceList",
+          "id": "toPosition",
+          "label": "Choose a position to receive the new security groups:",
+          "values": "<% var list = []; %>",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveDate",
+          "label": "Effective Date",
+          "required": true,
+          "visible": false
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "required": false,
+          "visible": false
+        },
+        {
+          "type": "textArea",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "required": false,
+          "visible": false
+        },
+        {
+          "type": "editButtonBar",
+          "editButtons": [
+            {
+              "type": "editButton",
+              "label": "Submit",
+              "id": "submit",
+              "buttonType": "PRIMARY"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+      ]
+    },
+  "onSubmit": "<% if(fromPosition.value == toPosition.value) {
+      toPosition.setError('ToPosition can not be the same as From Position. Please, choose another.');
+  }else{
+      toPosition.clearError();
+  } %>"
+  }
+}

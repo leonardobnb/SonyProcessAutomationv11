@@ -1,0 +1,33 @@
+{
+  "id": 2,
+  "name": "SRTarget",
+  "label": "SR Target",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "sRTargets",
+    "label": "SR Targets"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "toWorker",
+      "label": "To Worker",
+      "type": "SINGLE_INSTANCE",
+      "target": "WORKER"
+    },
+    {
+      "id": 2,
+      "name": "toPosition",
+      "type": "SINGLE_INSTANCE",
+      "target": "POSITION"
+    },
+    {
+      "id": 3,
+      "name": "referenceToSecurityRequest",
+      "type": "SINGLE_INSTANCE",
+      "target": "SecurityRequest"
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "id": "viewSecurityRequestEvent",
+  "endPoints": [
+    {
+      "name": "event",
+      "baseUrlType": "workday-bp",
+      "httpMethod": "GET",
+      "url": "<% 'events/' + queryParams.eventId %>",
+      "authType": "sso"
+    },
+    {
+      "name": "securityRequest",
+      "baseUrlType": "app",
+      "httpMethod": "GET",
+      "url": "<% 'securityRequests/' + event.for.id %>",
+      "authType": "sso"
+    },
+    {
+      "name": "sRTarget",
+      "baseUrlType": "app",
+      "httpMethod": "GET",
+      "url": "<% 'sRTargets/' %>",
+      "authType": "sso"
+    }
+  ],
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "title": {
+      "type": "title",
+      "label": "Security Request Details"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "instanceList",
+          "id": "fromWorker",
+          "label": "From Worker",
+          "instanceList": [
+            {
+              "id": "<% securityRequest.fromWorker.id %>",
+              "descriptor": "<% securityRequest.fromWorker.descriptor %>",
+              "wid": "<% securityRequest.fromWorker.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "fromPosition",
+          "label": "From Position",
+          "instanceList": [
+            {
+              "id": "<% securityRequest.fromPosition.id %>",
+              "descriptor": "<% securityRequest.fromPosition.descriptor %>",
+              "wid": "<% securityRequest.fromPosition.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "toWorker",
+          "label": "To Worker",
+          "instanceList": [
+            {
+              "id": "<% sRTarget.data.last().toWorker.id %>",
+              "descriptor": "<% sRTarget.data.last().toWorker.descriptor %>",
+              "wid": "<% sRTarget.data.last().toWorker.id %>"
+            }
+          ]
+        },
+        {
+          "type": "instanceList",
+          "id": "toPosition",
+          "label": "To Position",
+          "instanceList": [
+            {
+              "id": "<% sRTarget.data.last().toPosition.id %>",
+              "descriptor": "<% sRTarget.data.last().toPosition.descriptor %>",
+              "wid": "<% sRTarget.data.last().toPosition.id %>"
+            }
+          ]
+        },
+        {
+          "type": "date",
+          "id": "effectiveDate",
+          "label": "Effective Date",
+          "value": "<% securityRequest.effectiveDate %>"
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "value": "<% securityRequest.effectiveUntil %>"
+        },
+        {
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "value": "<% securityRequest.justificationText %>"
+        },
+        {
+          "type": "text",
+          "id": "queryParametroEventId",
+          "label": "query param event id",
+          "value": "<%queryParams.eventId%>",
+          "visible": false
+
+        },
+        {
+          "type": "text",
+          "id": "eventforid",
+          "label": "event for id",
+          "value": "<%event.for.id%>",
+          "visible": false
+
+        },
+        {
+          "type": "text",
+          "id": "eventStepid",
+          "label": "event step id",
+          "value": "<%queryParams.eventStepId%>",
+          "visible": false
+        }
+      ]
+    }
+  }
+}

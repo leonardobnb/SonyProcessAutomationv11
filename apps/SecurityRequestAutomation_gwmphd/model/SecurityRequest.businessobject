@@ -1,0 +1,49 @@
+{
+  "id": 1,
+  "name": "SecurityRequest",
+  "label": "Security Request",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "securityRequests",
+    "label": "Security Requests"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "fromWorker",
+      "label": "From Worker",
+      "type": "SINGLE_INSTANCE",
+      "target": "WORKER"
+    },
+    {
+      "id": 2,
+      "name": "fromPosition",
+      "label": "From Position",
+      "type": "SINGLE_INSTANCE",
+      "target": "POSITION",
+      "secureByTarget": true
+    },
+    {
+      "id": 3,
+      "name": "effectiveDate",
+      "label": "Effective Date",
+      "type": "DATE",
+      "precision": "DAY"
+    },
+    {
+      "id": 4,
+      "name": "effectiveUntil",
+      "label": "Effective Until",
+      "type": "DATE",
+      "precision": "DAY"
+    },
+    {
+      "id": 5,
+      "name": "justificationText",
+      "label": "Justification Text",
+      "type": "TEXT"
+    }
+  ]
+}
