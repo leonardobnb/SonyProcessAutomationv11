@@ -2,24 +2,26 @@
   "appProperties": [],
   "flowDefinitions": [
     {
-      "id": "selfRefPopup",
-      "name": "selfRefPopup",
+      "_comment": "Flow desde la página micro para elegir la security request, hasta la página en la que se desglosan los detalles",
+      "id": "microFirstPageFlow",
+      "name": "microFirstPageFlow",
       "flowSteps": [
         {
-          "id": "selfRefPopup",
+          "id": "microFirst",
+          "startsFlow": true,
           "transitions": [
             {
-              "id": "selfPop",
-              "value": "selfPop",
+              "value": "simpleEdit",
               "order": "a",
               "condition": "true"
             }
           ],
-          "taskId": "CreateSecurityRequestv11"
+          "taskId": "viewSecurityRequestMicro"
         },
         {
-          "id": "selfPop",
-          "taskId": "CreateSecurityRequestv11"
+          "id": "simpleEdit",
+          "startsFlow": false,
+          "taskId": "ViewSecurityRequest"
         }
       ]
     }
@@ -70,7 +72,7 @@
     },
     {
       "id": "viewSecurityRequestMicro",
-      "routingPattern": "viewSecurityRequestMicro",
+      "routingPattern": "/viewSecurityRequestMicro",
       "page": {
         "id": "viewSecurityRequestMicro"
       }

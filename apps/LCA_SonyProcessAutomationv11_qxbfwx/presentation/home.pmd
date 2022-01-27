@@ -23,7 +23,7 @@
           "label": "Manage Security Requestv11s",
           "action": "PRIMARY",
           "taskReference": {
-            "taskId": "manageSecurityRequestv11s"
+            "taskId": "viewSecurityRequestMicro"
           }
         }
       ]

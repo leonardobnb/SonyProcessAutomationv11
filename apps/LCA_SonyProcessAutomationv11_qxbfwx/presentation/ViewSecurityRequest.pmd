@@ -2,22 +2,6 @@
   "id": "ViewSecurityRequest",
   "endPoints": [
     {
-      "_comment": "Endpoint que devuelve todos los Security Request creados",
-      "name": "securityRequestv11s",
-      "baseUrlType": "app",
-      "url": "securityRequestv11s",
-      "authType": "sso",
-      "isCollection": "true"
-    },
-    {
-      "_comment": "Endpoint que devuelve todos los Security Request Targets creados",
-      "name": "sRTargetv11s",
-      "baseUrlType": "app",
-      "url": "sRTargetv11s",
-      "authType": "sso",
-      "isCollection": "true"
-    },
-    {
       "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
       "name": "getSRById",
       "baseUrlType": "app",
@@ -38,44 +22,12 @@
   "outboundData": {
     "outboundEndPoints": [ ]
   },
-  "script": "<%
-  //Función que rellena los campos con los datos del security request seleccionado por el usuario.
-             var valuesList = function(){
-                 var namesList = [];
-                 for(var Target : sRTargetv11s.data){
-                     var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequestv11.id});
-                     namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + date:parse(SRequest.effectiveDate, 'yyyy-MM-dd')});
-                 }
-             }
-             var populate = function(id) {
-                 if( !(empty id)) {
-                     var TRequest = getTById.invoke({'id': id});
-                         var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
-                         fromWorkerText.value = SRequest.fromWorker.descriptor;
-                         fromPositionText.value = SRequest.fromPosition.descriptor;
-                         toWorkerText.value = TRequest.toWorker.descriptor;
-                         toPositionText.value = TRequest.toPosition.descriptor;
-                         effectiveDateText.value = date:parse(SRequest.effectiveDate, 'yyyy-MM-dd');
-                         effectiveUntilText.value = date:parse(SRequest.effectiveUntil, 'yyyy-MM-dd');
-                         justificationText.value = SRequest.justificationText;
-                 }
-                     else {
-                     fromWorkerText.value = '';
-                         fromPositionText.value = '';
-                         toWorkerText.value = '';
-                         toPositionText.value = '';
-                         effectiveDateText.value = '';
-                         effectiveUntilText.value = '';
-                         justificationText.value = '';
-                 }
-             };
-             %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
     "pageType": "edit",
     "title": {
       "type": "title",
-      "label": "View Security Requestv11s",
+      "label": "View Security Requests",
       "enabled": true
     },
     "body": {
@@ -83,26 +35,22 @@
       "horizontal": false,
       "children": [
         {
-          "_comment": "instancelist para que el usuario seleccione el security request cuyos datos quiere ver",
-          "type": "instanceList",
-          "id": "srSelection",
-          "label": "Security Request",
-          "values": "<% pageVariables.namesList %>",
-          "onChange":"<%
-                      if(!empty self.value[0]){
-                          populate(self.value[0]);
-                      }else{
-                          populate(null);
-                      }
-                       %>"
-        },
-        {
           "_comment": "Se rellena con el dato from worker del security request",
           "type": "text",
           "label": "From worker",
           "id": "fromWorkerText",
           "enabled":"false",
-          "value": " "
+          "value": "<% //Se coje el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+              var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return SRequest.fromWorker.descriptor;
+
+          }
+              else {
+              return '';
+
+          } %>"
         },
         {
           "_comment": "Se rellena con el dato to worker del security request",
@@ -110,7 +58,15 @@
           "label": "To worker",
           "id": "toWorkerText",
           "enabled":"false",
-          "value": " "
+          "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                  var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return TRequest.toWorker.descriptor;
+          }
+              else {
+                  return '';
+          } %>"
         },
         {
           "_comment": "Se rellena con el dato to position del security request",
@@ -118,7 +74,15 @@
           "label": "To position",
           "id": "toPositionText",
           "enabled":"false",
-          "value": " "
+          "value": "<%//Se devuelve el valor de toPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+              var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return TRequest.toPosition.descriptor;
+          }
+              else {
+              return '';
+          } %>"
         },
         {
           "_comment": "Se rellena con el dato from position del security request",
@@ -126,7 +90,15 @@
           "id":"fromPositionText",
           "label": "From Position",
           "enabled":"false",
-          "value": " "
+          "value": "<% //Se devuelve el valor de fromPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                  var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return SRequest.fromPosition.descriptor;
+          }
+              else {
+                  return '';
+          } %>"
         },
         {
           "_comment": "Se rellena con el dato  effective date del security request",
@@ -135,7 +107,16 @@
           "datePrecision": "DAY",
           "label":"Effective date",
           "dateFormat": "yyyy-MM-dd",
-          "value": " ",
+          "value": "<% //Se devuelve el valor de effective date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+              var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return SRequest.effectiveDate;
+
+          }
+              else {
+                  return '';
+          } %>",
           "enabled":"false"
         },
 
@@ -147,7 +128,15 @@
           "datePrecision": "DAY",
           "enabled":"false",
           "dateFormat": "yyyy-MM-dd",
-          "value": " "
+          "value": "<%//Se devuelve el valor de effective until date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+              var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return (SRequest.effectiveUntil);
+          }
+              else {
+                  return '';
+          } %>"
         },
         {
           "_comment": "Se rellena con el dato justification text del security request",
@@ -155,18 +144,19 @@
           "id":"justificationText",
           "label":"Justification Text",
           "enabled":"false",
-          "value": " "
+          "value": "<% //Se devuelve el valor del justification text del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+              var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                  var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequestv11.id});
+                  return SRequest.justificationText;
+          }
+              else {
+                  return '';
+          }%>"
         }
       ]
     }
   },
-  "onLoad":"<%
-            pageVariables.namesList = [];
-            for(var Target : sRTargetv11s.data){
-                var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequestv11.id});
-                    pageVariables.namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + date:parse(SRequest.effectiveDate, 'yyyy-MM-dd')});
-            }
-            %>",
   "footer": {
     "type": "footer",
     "children": [

@@ -1,35 +1,90 @@
 {
   "id": "viewSecurityRequestMicro",
   "endPoints": [
-  ],
-  "presentation": {
-    "micro": "true",
-    "microFirstPageOnly":"true",
-    "headerSize": "VPS_DEFAULT",
-    "title": {
-      "type": "title",
-      "label": "Workday Extend"
+    {
+      "_comment": "Endpoint que devuelve todos los Security Request creados",
+      "name": "securityRequestv11s",
+      "baseUrlType": "app",
+      "url": "securityRequestv11s",
+      "authType": "sso",
+      "isCollection": "true"
     },
+    {
+      "_comment": "Endpoint que devuelve todos los Security Request Targets creados",
+      "name": "sRTargetv11s",
+      "baseUrlType": "app",
+      "url": "sRTargetv11s",
+      "authType": "sso",
+      "isCollection": "true"
+    },
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequestv11s' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    },
+    {
+      "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
+      "name": "getTById",
+      "baseUrlType": "app",
+      "url": "<% 'sRTargetv11s' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    }
+
+  ],
+  "outboundData": {
+    "outboundEndPoints":[
+      {
+        "values" : [ {
+                       "outboundPath" : "targetToShow",
+                       "value" : "<% srSelection.value[0] %>"
+                     } ],
+        "name" : "transitionOutboundVars",
+        "type" : "outboundVariable",
+        "variableScope" : "flow",
+        "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
+      }
+    ]
+  },
+  "script": "<%
+            //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
+             var instanceListValuesPopulate = function(){
+                 pageVariables.namesList = [];
+                 for (var Target : sRTargetv11s.data){
+                     var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequestv11.id});
+                         pageVariables.namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + SRequest.effectiveDate});
+                 }
+                 return pageVariables.namesList;
+             }
+             %>",
+  "presentation": {
+    "pageType": "edit",
+    "micro": "true",
+    "microFirstPageOnly": "true",
     "body": {
       "type": "section",
-      "horizontal": false,
+      "horizontal": true,
+      "title": "View Security Request",
       "children": [
         {
-          "type": "text",
-          "id": "hello",
-          "label": "Hello World!",
-          "value": "Welcome from Workday!"
+          "_comment": "instancelist para que el usuario seleccione el security request cuyos datos quiere ver",
+          "type": "instanceList",
+          "id": "srSelection",
+          "label": "Security Request",
+          "values": "<%  //Se llama a la función que devuelve una lista de valores, para rellenar el instance list con dichos valores, descritos anteriormente.
+                     instanceListValuesPopulate();
+                     %>",
+          "enabled": true
         }
       ]
     },
+
     "footer": {
       "type": "footer",
       "children": [
-        {
-          "type": "richText",
-          "enabled": "false",
-          "value": "Powered By Workday Extend"
-        }
       ]
     }
   }
