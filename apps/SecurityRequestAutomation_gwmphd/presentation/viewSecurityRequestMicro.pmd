@@ -1,0 +1,75 @@
+{
+  "id": "viewSecurityRequestMicro",
+  "endPoints": [
+    {
+      "_comment": "Endpoint que devuelve todos los Security Request Targets creados",
+      "name": "sRTargets",
+      "baseUrlType": "app",
+      "url": "sRTargets",
+      "authType": "sso",
+      "isCollection": "true"
+    },
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequests' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    }
+
+  ],
+  "outboundData": {
+    "outboundEndPoints":[
+      {
+        "values" : [ {
+                       "outboundPath" : "targetToShow",
+                       "value" : "<% srSelection.value[0] %>"
+                     } ],
+        "name" : "transitionOutboundVars",
+        "type" : "outboundVariable",
+        "variableScope" : "flow",
+        "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
+      }
+    ]
+  },
+  "script": "<%
+             //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
+             var instanceListValuesPopulate = function(){
+                 pageVariables.namesList = [];
+                 for (var Target : sRTargets.data){
+                     var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequest.id});
+                         pageVariables.namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + SRequest.effectiveDate});
+                 }
+                 return pageVariables.namesList;
+             }
+             %>",
+  "presentation": {
+    "pageType": "edit",
+    "micro": "true",
+    "microFirstPageOnly": "true",
+    "body": {
+      "type": "section",
+      "horizontal": true,
+      "title": "View Security Request",
+      "children": [
+        {
+          "_comment": "instancelist para que el usuario seleccione el security request cuyos datos quiere ver",
+          "type": "instanceList",
+          "id": "srSelection",
+          "label": "Security Request",
+          "values": "<%  //Se llama a la función que devuelve una lista de valores, para rellenar el instance list con dichos valores, descritos anteriormente.
+                     instanceListValuesPopulate();
+                     %>",
+          "enabled": true
+        }
+      ]
+    },
+
+    "footer": {
+      "type": "footer",
+      "children": [
+      ]
+    }
+  }
+}
