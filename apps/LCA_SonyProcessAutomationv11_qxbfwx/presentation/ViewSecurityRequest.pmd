@@ -24,11 +24,10 @@
   },
   "presentation": {
     "headerSize": "VPS_DEFAULT",
-    "pageType": "edit",
+    "pageType": "view",
     "title": {
       "type": "title",
-      "label": "View Security Requests",
-      "enabled": true
+      "label": "View Security Requests"
     },
     "body": {
       "type": "section",

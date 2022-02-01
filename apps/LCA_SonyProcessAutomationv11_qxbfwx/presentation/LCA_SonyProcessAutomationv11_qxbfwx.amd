@@ -20,7 +20,7 @@
         },
         {
           "id": "simpleEdit",
-          "startsFlow": false,
+          "endsFlow": true,
           "taskId": "ViewSecurityRequest"
         }
       ]
