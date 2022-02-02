@@ -3,8 +3,15 @@
   "endPoints": [
     {
       "name": "getAllWorkersWithPositions",
-      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20cf_CFESIWorkerGlobalID%20AS%20user%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
       "authType": "sso"
+    },
+    {
+      "name": "workerById",
+      "baseUrlType": "app",
+      "url": "<% 'https://api.workday.com/common/v1/workers' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
     },
     {
       "name": "getUniquePosition",
@@ -26,13 +33,15 @@
   "outboundData": {
     "outboundEndPoints": [
       {
-        "values" : [ {
-                       "outboundPath" : "submitted",
-                       "value" : true
-                     } ],
-        "name" : "transitionOutboundVars",
-        "type" : "outboundVariable",
-        "variableScope" : "flow",
+        "values": [
+          {
+            "outboundPath": "submitted",
+            "value": true
+          }
+        ],
+        "name": "transitionOutboundVars",
+        "type": "outboundVariable",
+        "variableScope": "flow",
         "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
       },
       {
@@ -105,7 +114,19 @@
     ]
   },
   "script": "<%
+             var instanceListValuesPopulate = function(){
+                 var namesList = [];
+                 for (var Worker : getAllWorkersWithPositions.data){
+                     if(!empty Worker.user){
+                         namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.user.id + ')', 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
+                     }else{
+                         namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor, 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
 
+                     }
+
+                 }
+                 return namesList;
+             }
              var getPositionsQuery = function(searchTXT){
 
                  var fullName = searchTXT;
@@ -153,10 +174,10 @@
       "horizontal": false,
       "children": [
         {
-          "type" : "congratulationsPopup",
-          "id":"congratsPopUp",
-          "textCongrats" : "Submission completed!",
-          "textSubmitted" : "",
+          "type": "congratulationsPopup",
+          "id": "congratsPopUp",
+          "textCongrats": "Submission completed!",
+          "textSubmitted": "",
           "render": "<% flowVariables.submitted ?? false %>",
           "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
 
@@ -166,7 +187,8 @@
           "id": "fromWorker",
           "label": "Select a worker to copy the security from:",
           "required": true,
-          "values": "<% getAllWorkersWithPositions.data %>",
+          "displayKey": "name",
+          "values": "<% instanceListValuesPopulate() %>",
           "onChange": "<%
                        /* Se comprueba si el popup es accesible, y de ser el caso,
                         se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
@@ -183,7 +205,7 @@
                                toWorker.visible= true;
 
 
-                               var getNameFromSearch = fromWorker.selectedEntries[0].descriptor;
+                               var getNameFromSearch = workerById.invoke({'id': fromWorker.selectedEntries[0].id}).descriptor;
 
                                if(moreThanOnePosition(getNameFromSearch) == false) {
 
@@ -324,10 +346,10 @@
       "children": [
       ]
     },
-  "onSubmit": "<% if(fromPosition.value == toPosition.value) {
-      toPosition.setError('ToPosition can not be the same as From Position. Please, choose another.');
-  }else{
-      toPosition.clearError();
-  } %>"
+    "onSubmit": "<% if(fromPosition.value == toPosition.value) {
+        toPosition.setError('ToPosition can not be the same as From Position. Please, choose another.');
+    }else{
+        toPosition.clearError();
+    } %>"
   }
 }
