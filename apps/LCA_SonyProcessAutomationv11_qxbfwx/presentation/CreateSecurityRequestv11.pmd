@@ -3,8 +3,15 @@
   "endPoints": [
     {
       "name": "getAllWorkersWithPositions",
-      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
+      "url": "https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20cf_CFESIWorkerGlobalID%20AS%20user%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty",
       "authType": "sso"
+    },
+    {
+      "name": "workerById",
+      "baseUrlType": "app",
+      "url": "<% 'https://api.workday.com/common/v1/workers' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
     },
     {
       "name": "getUniquePosition",
@@ -33,13 +40,15 @@
   "outboundData": {
     "outboundEndPoints": [
       {
-        "values" : [ {
-                       "outboundPath" : "submitted",
-                       "value" : true
-                     } ],
-        "name" : "transitionOutboundVars",
-        "type" : "outboundVariable",
-        "variableScope" : "flow",
+        "values": [
+          {
+            "outboundPath": "submitted",
+            "value": true
+          }
+        ],
+        "name": "transitionOutboundVars",
+        "type": "outboundVariable",
+        "variableScope": "flow",
         "_comment": "variable outbound que existe durante el flow, y que tiene valor true tras el primer submit, para mostrar así el popup de submit exitoso"
       },
       {
@@ -115,7 +124,7 @@
         "httpMethod": "POST",
         "authType": "sso",
         "onSend": "<% console.info(json:asJSON(self.data));
-                   return self.data; %>",
+        return self.data; %>",
         "values": [
           {
             "outboundPath": "businessProcessTarget.id",
@@ -126,13 +135,25 @@
     ]
   },
   "script": "<%
+             var instanceListValuesPopulate = function(){
+                 var namesList = [];
+                 for (var Worker : getAllWorkersWithPositions.data){
+                     if(!empty Worker.user){
+                         namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.user.id + ')', 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
+                     }else{
+                         namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor, 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
 
+                     }
+
+                 }
+                 return namesList;
+             }
              var getPositionsQuery = function(searchTXT){
 
-      var fullName = searchTXT;
-      return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
+                 var fullName = searchTXT;
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
 
-  };
+             };
 
              var getUniquePositionQuery = function(searchTXT){
                  var fullName = searchTXT;
@@ -152,9 +173,9 @@
              };
 
 
-  var getAssignableRolesForPositionQuery = function(positionId){
-  return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT myAssignableRoles FROM allWorkers WHERE positionsForWorker=\\''+ positionId + '\\'')
-  }
+             var getAssignableRolesForPositionQuery = function(positionId){
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT myAssignableRoles FROM allWorkers WHERE positionsForWorker=\\''+ positionId + '\\'')
+             }
 
 
              %>",
@@ -179,10 +200,10 @@
       "horizontal": false,
       "children": [
         {
-          "type" : "congratulationsPopup",
-          "id":"congratsPopUp",
-          "textCongrats" : "Submission completed!",
-          "textSubmitted" : "",
+          "type": "congratulationsPopup",
+          "id": "congratsPopUp",
+          "textCongrats": "Submission completed!",
+          "textSubmitted": "",
           "render": "<% flowVariables.submitted ?? false %>",
           "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
 
@@ -194,84 +215,84 @@
           "required": true,
           "values": "<% getAllWorkersWithPositions.data %>",
           "onChange": "<%
-                        /* Se comprueba si el popup es accesible, y de ser el caso,
-                         se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
+                       /* Se comprueba si el popup es accesible, y de ser el caso,
+                        se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
                        if(!empty congratsPopUp){
-                          congratsPopUp.visible=false;
+                           congratsPopUp.visible=false;
                        }
 
 
                        if (!empty fromWorker.value == true) {
-              fromPosition.visible = true;
-                  effectiveDate.visible = true;
-                  effectiveUntil.visible = true;
-                  justificationText.visible = true;
-                  toWorker.visible= true;
+                           fromPosition.visible = true;
+                               effectiveDate.visible = true;
+                               effectiveUntil.visible = true;
+                               justificationText.visible = true;
+                               toWorker.visible= true;
 
 
-          var getNameFromSearch = fromWorker.selectedEntries[0].descriptor;
+                               var getNameFromSearch = workerById.invoke({'id': fromWorker.selectedEntries[0].id}).descriptor;
 
-              if(moreThanOnePosition(getNameFromSearch) == false) {
-
-
-                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
-                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
-                      var arrayOfIdsPosition = [];
-                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                      fromPosition.setValues(allPositionsForWorker);
-                      fromPosition.setValue(arrayOfIdsPosition);
-
-                  var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value[0]});
-                      if(!empty assignableRoles.data) {
-                          var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
-                              fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
-
-                              fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
-                      }
+                               if(moreThanOnePosition(getNameFromSearch) == false) {
 
 
-                  var positionData = getUniquePosition.invoke({'fullName': getNameFromSearch});
-                  var positionUnique = positionData.data[0].position;
-                      var arrayOfIdAndDescriptorUniquePosition = [];
-                      arrayOfIdAndDescriptorUniquePosition.add(positionUnique);
-                  var arrayOfIdUniquePosition = [];
-                      arrayOfIdUniquePosition.add(positionUnique.id);
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       fromPosition.setValues(allPositionsForWorker);
+                                       fromPosition.setValue(arrayOfIdsPosition);
+
+                                       var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value[0]});
+                                       if(!empty assignableRoles.data) {
+                                           var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
+                                               fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
+
+                                               fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
+                                       }
 
 
-
-
-              } else {
-                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
-                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
-                      var arrayOfIdsPosition = [];
-                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                  fromPosition.setValues(allPositionsForWorker);
-                  fromPosition.setValue(arrayOfIdsPosition);
+                                       var positionData = getUniquePosition.invoke({'fullName': getNameFromSearch});
+                                       var positionUnique = positionData.data[0].position;
+                                       var arrayOfIdAndDescriptorUniquePosition = [];
+                                       arrayOfIdAndDescriptorUniquePosition.add(positionUnique);
+                                       var arrayOfIdUniquePosition = [];
+                                       arrayOfIdUniquePosition.add(positionUnique.id);
 
 
 
-                      var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value});
-                      if (!empty assignableRoles.data) {
-                          var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
-                              fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
 
-                              fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
-                      }
+                               } else {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       fromPosition.setValues(allPositionsForWorker);
+                                       fromPosition.setValue(arrayOfIdsPosition);
 
 
-              }
-          } else {
-          fromPosition.visible = false;
-              effectiveDate.visible = false;
-              effectiveUntil.visible = false;
-              justificationText.visible = false;
-              toWorker.setValue([]);
-              toPosition.setValue([]);
-              toWorker.visible = false;
-              toPosition.visible = false;
-              fromAssignableRolesForPositionNameGrid.setRows([]);
-              fromAssignableRolesForPositionNameGrid.visible = false;
-          }%>"
+
+                                       var assignableRoles = getAssignableRolesForPosition.invoke({'positionId': fromPosition.value});
+                                       if (!empty assignableRoles.data) {
+                                           var allAssignableRolesForWorker = assignableRoles.data[0].myAssignableRoles;
+                                               fromAssignableRolesForPositionNameGrid.setRows(allAssignableRolesForWorker);
+
+                                               fromAssignableRolesForPositionNameGrid.visible = false; //set to true to show the grid on page
+                                       }
+
+
+                               }
+                       } else {
+                           fromPosition.visible = false;
+                               effectiveDate.visible = false;
+                               effectiveUntil.visible = false;
+                               justificationText.visible = false;
+                               toWorker.setValue([]);
+                               toPosition.setValue([]);
+                               toWorker.visible = false;
+                               toPosition.visible = false;
+                               fromAssignableRolesForPositionNameGrid.setRows([]);
+                               fromAssignableRolesForPositionNameGrid.visible = false;
+                       }%>"
         },
         {
           "type": "instanceList",
@@ -290,33 +311,33 @@
           "values": "<% getAllWorkersWithPositions.data %>",
           "onChange": "<%
                        if (!empty toWorker.value == true) {
-              toPosition.visible = true;
-          var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
+                           toPosition.visible = true;
+                               var getNameFromSearch = toWorker.selectedEntries[0].descriptor;
 
-              if(moreThanOnePosition(getNameFromSearch) == false) {
-                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
-                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
-                      var arrayOfIdsPosition = [];
-                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                      toPosition.setValues(allPositionsForWorker);
-                      toPosition.setValue(arrayOfIdsPosition);
-                  toPosition.clearError();
+                               if(moreThanOnePosition(getNameFromSearch) == false) {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       toPosition.setValues(allPositionsForWorker);
+                                       toPosition.setValue(arrayOfIdsPosition);
+                                       toPosition.clearError();
 
-              } else {
-                  var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
-                      var allPositionsForWorker = positionsData.data[0].positionsForWorker;
+                               } else {
+                                   var positionsData = getPositions.invoke({'fullName': getNameFromSearch});
+                                       var allPositionsForWorker = positionsData.data[0].positionsForWorker;
 
-                      var arrayOfIdsPosition = [];
-                      arrayOfIdsPosition.add(allPositionsForWorker[0].id);
-                      toPosition.setValues(allPositionsForWorker);
-                      toPosition.setValue(arrayOfIdsPosition);
-                      toPosition.clearError();
+                                       var arrayOfIdsPosition = [];
+                                       arrayOfIdsPosition.add(allPositionsForWorker[0].id);
+                                       toPosition.setValues(allPositionsForWorker);
+                                       toPosition.setValue(arrayOfIdsPosition);
+                                       toPosition.clearError();
 
-              }
-          } else {
-          toPosition.visible = false;
-              toPosition.clearError();
-          }%>"
+                               }
+                       } else {
+                           toPosition.visible = false;
+                               toPosition.clearError();
+                       }%>"
         },
         {
           "type": "instanceList",
@@ -401,6 +422,6 @@
   "onSubmit": "<% if(fromPosition.value == toPosition.value) {
       toPosition.setError('ToPosition can not be the same as From Position. Please, choose another.');
   }else{
-  toPosition.clearError();
+      toPosition.clearError();
   } %>"
 }
