@@ -132,6 +132,9 @@
         },
         "isReferenceId": {
           "type": "boolean"
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -173,6 +176,9 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 5
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -210,6 +216,9 @@
           "enum": [
             "CURRENCY"
           ]
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -246,6 +255,9 @@
           "enum": [
             "INTEGER"
           ]
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -282,6 +294,9 @@
           "enum": [
             "BOOLEAN"
           ]
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -330,6 +345,9 @@
             "MONTH",
             "YEAR"
           ]
+        },
+        "isPurgeable": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -375,6 +393,9 @@
           "type": "boolean"
         },
         "useForDisplay": {
+          "type": "boolean"
+        },
+        "isPurgeable": {
           "type": "boolean"
         }
       },
