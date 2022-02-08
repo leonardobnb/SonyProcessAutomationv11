@@ -2,8 +2,9 @@
   "id": "CreateSecurityRequest",
   "endPoints": [
     {
+      "_comment":"endpoint que devuelve los workers en función de la busqueda que haga el usuario, no siendo invocado si el usuario no ha escrito nada, para evitar problemas de rendimiento",
       "name": "workerSearch",
-      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20allWorkers%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20fullName%20CONTAINS%20%22' + instanceListQuery + '%22' %>",
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20workersForHCMReporting(dataSourceFilter%3DallActiveWorkers)%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20fullName%20CONTAINS%20%22' + instanceListQuery + '%22' %>",
       "exclude": "<% empty instanceListQuery %>",
       "authType": "sso",
       "deferred": true
@@ -132,14 +133,12 @@
              var getPositionsQuery = function(searchTXT){
 
                  var fullName = searchTXT;
-                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
-
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT positionsForWorker, managementLevel FROM workersForHCMReporting(dataSourceFilter=allActiveWorkers) WHERE fullName=\\''+ fullName + '\\' AND positionsForWorker is not empty AND managementLevel is not empty');
              };
 
              var getUniquePositionQuery = function(searchTXT){
                  var fullName = searchTXT;
-                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM allWorkers WHERE fullName=\\''+ fullName + '\\' AND position is not empty')
-             }
+                 return 'https://api.workday.com/wql/v1/data?query=' + string:urlEncode('SELECT position FROM workersForHCMReporting(dataSourceFilter=allActiveWorkers) WHERE fullName=\\''+ fullName + '\\' AND position is not empty') }
 
 
 
@@ -278,7 +277,7 @@
           "onChange": "<%
                        if (!empty toWorker.value == true) {
                            toPosition.visible = true;
-                               var getNameFromSearch = workerById.invoke({'id': fromWorker.value[0]}).descriptor;
+                               var getNameFromSearch = workerById.invoke({'id': toWorker.value[0]}).descriptor;
 
                                if(moreThanOnePosition(getNameFromSearch) == false) {
                                    var positionsData = getPositions.invoke({'fullName': getNameFromSearch});

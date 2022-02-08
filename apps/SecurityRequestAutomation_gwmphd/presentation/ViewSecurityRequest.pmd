@@ -52,6 +52,23 @@
 
                     } %>"
         },
+
+        {
+          "_comment": "Se rellena con el dato from position del security request",
+          "type": "text",
+          "id": "fromPositionText",
+          "label": "From Position",
+          "enabled": "false",
+          "value": "<% //Se devuelve el valor de fromPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return SRequest.fromPosition.descriptor;
+                    }
+                        else {
+                        return '';
+                    } %>"
+        },
         {
           "_comment": "Se rellena con el dato to worker del security request",
           "type": "text",
@@ -79,22 +96,6 @@
                         var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
                             var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
                             return TRequest.toPosition.descriptor;
-                    }
-                        else {
-                        return '';
-                    } %>"
-        },
-        {
-          "_comment": "Se rellena con el dato from position del security request",
-          "type": "text",
-          "id": "fromPositionText",
-          "label": "From Position",
-          "enabled": "false",
-          "value": "<% //Se devuelve el valor de fromPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return SRequest.fromPosition.descriptor;
                     }
                         else {
                         return '';

@@ -48,10 +48,14 @@
     "pageType": "edit",
     "micro": "true",
     "microFirstPageOnly": "true",
+    "title": {
+      "type": "title",
+      "label": "View Security Request"
+    },
     "body": {
       "type": "section",
       "horizontal": true,
-      "title": "View Security Request",
+
       "children": [
         {
           "_comment": "instancelist para que el usuario seleccione el security request cuyos datos quiere ver",
