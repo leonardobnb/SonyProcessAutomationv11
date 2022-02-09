@@ -4,7 +4,7 @@
     {
       "_comment":"endpoint que devuelve los workers en función de la busqueda que haga el usuario, no siendo invocado si el usuario no ha escrito nada, para evitar problemas de rendimiento",
       "name": "workerSearch",
-      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20workersForHCMReporting(dataSourceFilter%3DallActiveWorkers)%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20fullName%20CONTAINS%20%22' + instanceListQuery + '%22' %>",
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20cf_ZCFESIWorkerGlobalID%20AS%20globalid%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20workersForHCMReporting(dataSourceFilter%3DallActiveWorkers)%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20fullName%20CONTAINS%20%22' + instanceListQuery + '%22' %>",
       "exclude": "<% empty instanceListQuery %>",
       "authType": "sso",
       "deferred": true
@@ -117,9 +117,11 @@
     ]
   },
   "script": "<%
-           /* var instanceListValuesPopulate = function(){
+
+
+            var instanceListValuesPopulate = function(searchList){
                  var namesList = [];
-                 for (var Worker : workerSearch.data){
+                 for (var Worker : searchList){
                      if(!empty Worker.user){
                          namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.user.id + ')', 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
                      }else{
@@ -129,7 +131,7 @@
 
                  }
                  return namesList;
-             }*/
+             }
              var getPositionsQuery = function(searchTXT){
 
                  var fullName = searchTXT;
@@ -188,11 +190,21 @@
           "id": "fromWorker",
           "label": "Select a worker to copy the security from:",
           "required": true,
-          "displayKey": "descriptor",
+          "displayKey": "name",
           "multiSelect":"false",
           "values": "<% [] %>",
           "searchEndPoint": "<% endpoints.workerSearch %>",
-          "searchResultValues": "<% workerSearch.data %>",
+          "searchResultValues": "<% var namesList = [];
+          for (var Worker : workerSearch.data){
+              if(!empty Worker.globalid){
+                  namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.globalid.descriptor + ')', 'positions': Worker.positions,'managementLevel':Worker.managementLevel});
+              }else{
+                  namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.positions[0].descriptor +' )', 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
+
+              }
+
+          }
+          return namesList; %>",
           "onChange": "<%
                        /* Se comprueba si el popup es accesible, y de ser el caso,
                         se pone el visible a false para evitar que se vuelva a mostrar al seleccionar los workers*/
@@ -270,8 +282,19 @@
           "id": "toWorker",
           "label": "Choose the target worker:",
           "required": true,
+          "displayKey":"name",
           "searchEndPoint": "<% endpoints.workerSearch %>",
-          "searchResultValues": "<% workerSearch.data %>",
+          "searchResultValues": "<% var namesList = [];
+          for (var Worker : workerSearch.data){
+              if(!empty Worker.globalid){
+                  namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.globalid.descriptor + ')', 'positions': Worker.positions,'managementLevel':Worker.managementLevel});
+              }else{
+                  namesList.add({'id':Worker.id,'descriptor': Worker.descriptor, 'name': Worker.descriptor + ' (' + Worker.positions[0].descriptor +' )', 'positions': Worker.positions,'managementLevel':Worker.managementLevel,'user': Worker.user});
+
+              }
+
+          }
+          return namesList; %>",
           "visible": false,
           "values": "<% [] %>",
           "onChange": "<%
