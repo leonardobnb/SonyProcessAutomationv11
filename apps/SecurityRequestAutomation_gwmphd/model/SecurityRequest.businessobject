@@ -44,6 +44,13 @@
       "name": "justificationText",
       "label": "Justification Text",
       "type": "TEXT"
+    },
+    {
+      "id": 6,
+      "name": "processingStatus",
+      "label": "Processing Status",
+      "type": "SINGLE_INSTANCE",
+      "target": "ProcessingStatus"
     }
   ]
 }
