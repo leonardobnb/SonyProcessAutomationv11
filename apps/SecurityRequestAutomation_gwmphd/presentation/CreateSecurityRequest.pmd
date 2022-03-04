@@ -11,9 +11,10 @@
     },
     {
       "name": "processingStatusSearch",
-      "url": "<% 'https://api.workday.com/apps/SecurityRequestAutomation_gwmphd/v1/processingStatuses' %>",
+      "baseUrlType": "app",
+      "url": "processingStatuses",
       "authType": "sso",
-      "deferred": true
+      "isCollection": "true"
     },
     {
       "name": "workerById",
@@ -83,7 +84,7 @@
           },
           {
             "outboundPath": "processingStatus",
-            "value": "<% processingStatusSearch.data[0] %>"
+            "value": "<% {'id': processingStatusSearch.data[0].id , 'descriptor' : processingStatusSearch.data[0].descriptor} %>"
           }
         ]
       },
