@@ -16,6 +16,14 @@
       "url": "<% 'sRTargets' + '/' + id %>",
       "authType": "sso",
       "deferred": true
+    },
+    {
+      "_comment": "Endpoint que devuelve el Pending Status cuyo id coincide con el de la url",
+      "name": "getStatusById",
+      "baseUrlType": "app",
+      "url": "<% 'processingStatuses' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
     }
 
   ],
@@ -154,7 +162,23 @@
                         else {
                         return '';
                     }%>"
-        }
+        },{
+           "_comment": "Se rellena con el dato Processing Status del security request",
+           "type": "text",
+           "label": "Processing Status",
+           "id": "statusText",
+           "enabled": "false",
+           "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                     if( !(empty flowVariables.targetToShow)) {
+                         var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                             var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                             var Status = getStatusById.invoke({'id': SRequest.processingStatus.id});
+                             return Status.status;
+                     }
+                         else {
+                         return '';
+                     } %>"
+         }
       ]
     }
   },
