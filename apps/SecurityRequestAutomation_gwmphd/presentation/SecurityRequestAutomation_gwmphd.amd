@@ -83,6 +83,13 @@
       "page": {
         "id": "viewSecurityRequestMicro"
       }
+    },
+    {
+      "id": "securityRequestEventAction",
+      "routingPattern": "/securityRequestEventAction/{eventId}",
+      "page": {
+        "id": "securityRequestEventAction"
+      }
     }
   ],
   "applicationId": "SecurityRequestAutomation_gwmphd",
@@ -98,6 +105,10 @@
     {
       "key": "workday-bp",
       "value": "https://api.workday.com/businessProcess/v1/"
+    },
+    {
+      "key": "WORKDAY-WQL",
+      "value": "https://api.workday.com/wql/v1/"
     }
   ]
 }

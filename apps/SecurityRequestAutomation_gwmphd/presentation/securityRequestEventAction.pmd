@@ -1,5 +1,5 @@
 {
-  "id": "viewSecurityRequestEvent",
+  "id": "securityRequestEventAction",
   "endPoints": [
     {
       "name": "createSecurityRequestEvents",
@@ -17,9 +17,9 @@
     },
     {
       "name": "sRTarget",
-      "baseUrlType": "app",
+      "baseUrlType": "WORKDAY-WQL",
       "httpMethod": "GET",
-      "url": "<% 'sRTargets/' %>",
+      "url": "<% 'data?query=' + string:urlEncode('SELECT referenceToSecurityRequest, toWorker, toPosition FROM SecurityRequestAutomation_gwmphd_sRTargets WHERE referenceToSecurityRequest=') + '%22' + createSecurityRequestEvents.businessProcessTarget.id + '%22' %>",
       "authType": "sso"
     }
   ],
@@ -63,9 +63,9 @@
           "label": "To Worker",
           "instanceList": [
             {
-              "id": "<% sRTarget.data.last().toWorker.id %>",
-              "descriptor": "<% sRTarget.data.last().toWorker.descriptor %>",
-              "wid": "<% sRTarget.data.last().toWorker.id %>"
+              "id": "<% sRTarget.data[0].toWorker.id %>",
+              "descriptor": "<% sRTarget.data[0].toWorker.descriptor %>",
+              "wid": "<% sRTarget.data[0].toWorker.id %>"
             }
           ]
         },
@@ -75,9 +75,9 @@
           "label": "To Position",
           "instanceList": [
             {
-              "id": "<% sRTarget.data.last().toPosition.id %>",
-              "descriptor": "<% sRTarget.data.last().toPosition.descriptor %>",
-              "wid": "<% sRTarget.data.last().toPosition.id %>"
+              "id": "<% sRTarget.data[0].toPosition.id %>",
+              "descriptor": "<% sRTarget.data[0].toPosition.descriptor %>",
+              "wid": "<% sRTarget.data[0].toPosition.id %>"
             }
           ]
         },
@@ -101,9 +101,8 @@
         },
         {
           "type": "hidden",
-          "id": "queryParametroEventId",
-          "label": "query param event id",
-          "value": "<%queryParams.eventId%>"
+          "id": "trial",
+          "value": "<% sRTarget.data %>"
         }
       ]
     }
