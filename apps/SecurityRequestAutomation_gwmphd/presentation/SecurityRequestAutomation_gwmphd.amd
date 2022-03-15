@@ -31,6 +31,7 @@
       "flowSteps": [
         {
           "id": "selfRefPopup",
+          "startsFlow": true,
           "transitions": [
             {
               "id": "selfPop",
