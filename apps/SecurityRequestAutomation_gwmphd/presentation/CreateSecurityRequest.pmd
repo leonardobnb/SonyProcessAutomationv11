@@ -2,9 +2,9 @@
   "id": "CreateSecurityRequest",
   "endPoints": [
     {
-      "_comment":"endpoint que devuelve los workers en función de la busqueda que haga el usuario, no siendo invocado si el usuario no ha escrito nada, para evitar problemas de rendimiento",
+      "_comment": "endpoint que devuelve los workers en función de la busqueda que haga el usuario, no siendo invocado si el usuario no ha escrito nada, para evitar problemas de rendimiento",
       "name": "workerSearch",
-      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20cf_ZCFESIWorkerGlobalID%20AS%20globalid%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20workersForHCMReporting(dataSourceFilter%3DallActiveWorkers)%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20fullName%20CONTAINS%20%22' + instanceListQuery + '%22' %>",
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20fullName%20AS%20descriptor%2C%20cf_ZCFESIWorkerGlobalID%20AS%20globalid%2C%20workdayID%20AS%20id%2C%20positionsForWorker%20AS%20positions%2C%20managementLevel%20FROM%20workersForHCMReporting(dataSourceFilter%3DallActiveWorkers)%20WHERE%20positionsForWorker%20is%20not%20empty%20AND%20managementLevel%20is%20not%20empty%20AND%20(fullName%20STARTSWITH%20%22'+ instanceListQuery +'%22%20OR%20employeeID%20STARTSWITH%20%22'+instanceListQuery+'%22%20OR%20cf_ZCF_ToText_Worker_GlobalIDValue%20STARTSWITH%20%22'+instanceListQuery+'%22)' %>",
       "exclude": "<% empty instanceListQuery %>",
       "authType": "sso",
       "deferred": true
