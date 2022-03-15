@@ -3,23 +3,23 @@
   "endPoints": [
     {
       "name": "createSecurityRequestEvents",
-      "baseUrlType": "app",
       "httpMethod": "GET",
-      "url": "<% 'createSecurityRequestEvents/' + queryParams.eventId %>",
+      "baseUrlType": "WORKDAY-WQL",
+      "url": "<% 'data?query=' + string:urlEncode('SELECT businessProcessTarget FROM SecurityRequestAutomation_gwmphd_createSecurityRequestEvents WHERE workdayID=') + '%22' + queryParams.eventId + '%22'  %>",
       "authType": "sso"
     },
     {
       "name": "securityRequest",
       "baseUrlType": "app",
       "httpMethod": "GET",
-      "url": "<% 'securityRequests/' + createSecurityRequestEvents.businessProcessTarget.id %>",
+      "url": "<% 'securityRequests/' + createSecurityRequestEvents.data[0].businessProcessTarget.id %>",
       "authType": "sso"
     },
     {
       "name": "sRTarget",
       "baseUrlType": "WORKDAY-WQL",
       "httpMethod": "GET",
-      "url": "<% 'data?query=' + string:urlEncode('SELECT referenceToSecurityRequest, toWorker, toPosition FROM SecurityRequestAutomation_gwmphd_sRTargets WHERE referenceToSecurityRequest=') + '%22' + createSecurityRequestEvents.businessProcessTarget.id + '%22' %>",
+      "url": "<% 'data?query=' + string:urlEncode('SELECT referenceToSecurityRequest, toWorker, toPosition FROM SecurityRequestAutomation_gwmphd_sRTargets WHERE referenceToSecurityRequest=') + '%22' + securityRequest.id + '%22' %>",
       "authType": "sso"
     }
   ],
@@ -101,8 +101,13 @@
         },
         {
           "type": "hidden",
-          "id": "trial",
-          "value": "<% sRTarget.data %>"
+          "label": "WQL Result",
+          "value": "<% createSecurityRequestEvents %>"
+        },
+        {
+          "type": "hidden",
+          "label": "eventID",
+          "value": "<% queryParams.eventId %>"
         }
       ]
     }
