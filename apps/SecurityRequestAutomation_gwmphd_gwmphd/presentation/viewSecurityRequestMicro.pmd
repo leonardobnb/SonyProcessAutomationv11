@@ -3,15 +3,17 @@
   "endPoints": [
     {
       "_comment": "Endpoint que devuelve todos los Security Request Targets creados",
-      "name": "srList",
-      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20workdayID%2C%20toWorker%2C%20referenceToSecurityRequest%7BfromWorker%2C%20effectiveDate%2C%20createdMoment%7D%20FROM%20SecurityRequestAutomation_gwmphd_sRTargets' %>",
+      "name": "sRTargets",
+      "baseUrlType": "app",
+      "url": "sRTargets",
       "authType": "sso",
       "isCollection": "true"
     },
     {
       "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
-      "name": "getBPEvents",
-      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20createdMoment%20FROM%20SecurityRequestAutomation_gwmphd_sRTargets%20WHERE%20workdayID%3D%22'+ id +'%22' %>",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequests' + '/' + id %>",
       "authType": "sso",
       "deferred": true
     }
@@ -23,10 +25,6 @@
           {
             "outboundPath": "targetToShow",
             "value": "<% srSelection.value[0] %>"
-          },
-          {
-            "outboundPath": "createdMomentRequest",
-            "value": "<% getBPEvents.invoke({'id': srSelection.value[0]}).data[0].createdMoment %>"
           }
         ],
         "name": "transitionOutboundVars",
@@ -40,8 +38,9 @@
              //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
              var instanceListValuesPopulate = function(){
                  pageVariables.namesList = [];
-                 for (var item : srList.data){
-                     pageVariables.namesList.add({'id':item.workdayID, 'descriptor':'From ' + item.referenceToSecurityRequest.fromWorker.descriptor + ' to ' + item.toWorker.descriptor + ' with effective date: ' + item.referenceToSecurityRequest.effectiveDate + ', and creation moment: ' + item.referenceToSecurityRequest.createdMoment.replace('T',' ').replace('Z','')});
+                 for (var Target : sRTargets.data){
+                     var SRequest = getSRById.invoke({'id': Target.referenceToSecurityRequest.id});
+                         pageVariables.namesList.add({'id':Target.id, 'descriptor':'From ' + SRequest.fromWorker.descriptor + ' to ' + Target.toWorker.descriptor + ' on date: ' + SRequest.effectiveDate});
                  }
                  return pageVariables.namesList;
              }

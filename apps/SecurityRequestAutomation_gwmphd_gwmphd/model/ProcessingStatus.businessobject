@@ -1,0 +1,20 @@
+{
+  "id": 3,
+  "name": "ProcessingStatus",
+  "label": "Processing Status",
+  "defaultSecurityDomains": [
+    "CreateSecurityRequest"
+  ],
+  "defaultCollection": {
+    "name": "processingStatuses",
+    "label": "Processing Statuses"
+  },
+  "fields": [
+    {
+      "id": 1,
+      "name": "status",
+      "label": "Processing Status Name",
+      "type": "TEXT"
+    }
+  ]
+}

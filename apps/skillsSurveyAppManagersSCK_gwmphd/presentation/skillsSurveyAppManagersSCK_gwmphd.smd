@@ -1,13 +1,13 @@
 {
-  "id": "SecurityRequestAutomation_gwmphd",
+  "id": "skillsSurveyAppManagersSCK_gwmphd",
   "languages": [
-    {
-      "code": "es-ES",
-      "description": "Spanish"
-    },
     {
       "code": "en-US",
       "description": "English"
+    },
+    {
+      "code": "ja-JP",
+      "description": "Japanese"
     }
   ],
   "siteAuth": {
@@ -18,8 +18,8 @@
       }
     ]
   },
-  "siteId": "SecurityRequestAutomation_gwmphd",
+  "siteId": "skillsSurveyAppManagersSCK_gwmphd",
   "cdnEnabled": true,
   "siteProperties": [ ],
-  "applicationId": "SecurityRequestAutomation_gwmphd"
+  "applicationId": "skillsSurveyAppManagersSCK_gwmphd"
 }

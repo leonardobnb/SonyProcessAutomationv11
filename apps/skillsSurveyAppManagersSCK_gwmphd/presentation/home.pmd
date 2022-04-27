@@ -1,0 +1,165 @@
+{
+  "id": "home",
+  "endPoints": [
+    {
+      "name": "personalInfo",
+      "baseUrlType": "WORKDAY",
+      "url": "/common/v1/workers/me",
+      "authType": "sso"
+    },
+    {
+      "name": "custOrgInfo",
+      "url": "https://api.workday.com/customObject/v2/customObjects/ssconfiguration/<% environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID)) %>",
+      "authType": "sso"
+    },
+    {
+      "name": "teamSkills",
+      "baseUrlType": "WORKDAY",
+      "deferred": true,
+      "url": "/raas/7000017312/WCP_SS_My_Team_Pending_Skills_SCK?Custom_Org_WID%21WID=<% approval %>&format=json",
+      "authType": "sso"
+    },
+    {
+      "name": "getManager",
+      "baseUrlType": "WORKDAY",
+      "authType": "sso",
+      "url": "/raas/7000017312/WCP_SS_Worker_Manager_SCK?Include_Subordinate_Organizations=1&Worker%21WID=<% personalInfo.id %>&Subfilter_Top_Custom_Org=<% environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID)) %>&format=json"
+    }
+  ],
+  "script": "<%
+             var getSubtotalCustOrg = function(skills, code){ //coge de una lista de skills las que contenga el código que yo pasé, en este caso sera las iniciales de mi Custom Org
+
+                 var cont = 0;
+
+                 for(var skill : skills){
+
+                     if(string:contains(skill.referenceID, code)){
+                         cont = cont + 1;
+                     }
+
+                 }
+                 return cont;
+             };
+             var formatOrg = function(list){ //Lucas no se acuerda muy bien el porque de esta funcion
+                 var res= '';
+                 var cont = 0;
+                 for(var org : list){
+                     if(cont == 0){
+                         res = org['Organization'];
+                     }else{
+                         res = string:concat(string:concat(res, '%21'), org['Organization']);
+                     }
+                         cont = cont+1;
+                 }
+                 return res;
+             };
+             %>",
+  "onLoad": "<%
+               pageVariables.teamSkills = teamSkills.invoke({'approval': (environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID))) + '&Sup_Org_Manager%21WID=' + personalInfo.id });
+   %>",
+  "presentation": {
+    "headerSize": "STANDARD",
+    "title": {
+      "type": "title",
+      "label": "<% presentationLabels.yourTeamSkillRequests %>"
+    },
+    "body": {
+      "type": "section",
+      "children": [
+        {
+          "type": "section",
+          "horizontal": "true",
+          "children": [
+            {
+              "type": "section",
+              "children": [
+                {
+                  "type": "button",
+                  "label": "<% presentationLabels.manageAllSkills %>",
+                  "taskReference": {
+                    "type": "taskReference",
+                    "taskId": "approveMyTeamSkills"
+                  },
+                  "action": "PRIMARY",
+                  "commandHttpMethod": "GET"
+                },
+                {
+                  "id": "usersPendingSkills",
+                  "type": "grid",
+                  "rows": "<% pageVariables.teamSkills.Report_Entry %>",
+                  "gridType": "LIST",
+                  "rowVariableName": "apidata",
+                  "doNotAdd": "true",
+                  "doNotRemoveRow": "true",
+                  "doNotRemove": "true",
+                  "columns": [
+                    {
+                      "cellTemplate": {
+                        "type": "text",
+                        "enabled": "false",
+                        "value": "<% apidata.Worker %>"
+                      },
+                      "columnId": "v0",
+                      "label": "<% presentationLabels.employeeName %>",
+                      "type": "column"
+                    },
+                    {
+                      "cellTemplate": {
+                        "type": "number",
+                        "enabled": "false",
+                        "value": "<% getSubtotalCustOrg(apidata.Skills_group, custOrgInfo.catalogCode) %>"
+                      },
+                      "columnId": "v1",
+                      "label": "<% presentationLabels.numberOfSkills %>",
+                      "type": "column"
+                    },
+                    {
+                      "cellTemplate": {
+                        "type": "button",
+                        "label": "<% presentationLabels.manageSkills %>",
+                        "action": "PRIMARY",
+                        "taskReference": {
+                          "parameterBindings": {
+                            "userId": "<% apidata.Employee_ID %>"
+                          },
+                          "taskId": "approveUserSkills"
+                        }
+                      },
+                      "columnId": "v2",
+                      "type": "column"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "section",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "                      "
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "horizontal": "true",
+          "children": [
+            {
+              "type": "section",
+              "children": [
+                {
+                  "type": "richText",
+                  "enabled": "false",
+                  "value": "<h2 style=\"text-align: center;\">Skills App V3.0</h2>"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

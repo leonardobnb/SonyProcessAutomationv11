@@ -1,0 +1,110 @@
+{
+  "appProperties": [
+    {
+      "key": "GMS_ID",
+      "value": "UNDEFINED"
+    },
+    {
+      "key": "IMPL_ID",
+      "value": "664d220edebf011256f74da2da01220f"
+    },
+    {
+      "key": "SBX_ID",
+      "value": "664d220edebf011256f74da2da01220f"
+    },
+    {
+      "key": "PROD_ID",
+      "value": "664d220edebf011256f74da2da01220f"
+    }
+  ],
+  "flowDefinitions": [
+    {
+      "id": "flowApproveSkills",
+      "flowSteps": [
+        {
+          "id": "approveSkills",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "popUpApproveSkills",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "approveMyTeamSkills"
+        },
+        {
+          "id": "popUpApproveSkills",
+          "endsFlow": true,
+          "taskId": "popUpApproveSkills"
+        }
+      ]
+    },
+    {
+      "id": "flowApproveWorkerSkills",
+      "flowSteps": [
+        {
+          "id": "approveWorkerSkills",
+          "transitions": [
+            {
+              "order": "a",
+              "value": "popUpApproveUserSkills",
+              "condition": "true"
+            }
+          ],
+          "startsFlow": true,
+          "taskId": "approveUserSkills"
+        },
+        {
+          "id": "popUpApproveUserSkills",
+          "endsFlow": true,
+          "taskId": "popUpApproveUserSkills"
+        }
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "root",
+      "routingPattern": "/",
+      "page": {
+        "id": "home"
+      }
+    },
+    {
+      "id": "approveUserSkills",
+      "routingPattern": "approveUserSkills",
+      "page": {
+        "id": "approveUserSkills"
+      }
+    },
+    {
+      "id": "approveMyTeamSkills",
+      "routingPattern": "approveMyTeamSkills",
+      "page": {
+        "id": "approveMyTeamSkills"
+      }
+    },
+    {
+      "id": "popUpApproveSkills",
+      "routingPattern": "popUpApproveSkills",
+      "page": {
+        "id": "popUpApproveSkills"
+      }
+    },
+    {
+      "id": "popUpApproveUserSkills",
+      "routingPattern": "popUpApproveUserSkills",
+      "page": {
+        "id": "popUpApproveUserSkills"
+      }
+    }
+  ],
+  "applicationId": "skillsSurveyAppManagersSCK_gwmphd",
+  "dataProviders": [
+    {
+      "key": "WORKDAY",
+      "value": "https://api.workday.com"
+    }
+  ]
+}

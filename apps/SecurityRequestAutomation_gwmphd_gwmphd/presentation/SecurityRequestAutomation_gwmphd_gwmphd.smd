@@ -1,5 +1,5 @@
 {
-  "id": "SecurityRequestAutomation_gwmphd",
+  "id": "SecurityRequestAutomation_gwmphd_gwmphd",
   "languages": [
     {
       "code": "es-ES",
@@ -18,8 +18,8 @@
       }
     ]
   },
-  "siteId": "SecurityRequestAutomation_gwmphd",
+  "siteId": "SecurityRequestAutomation_gwmphd_gwmphd",
   "cdnEnabled": true,
   "siteProperties": [ ],
-  "applicationId": "SecurityRequestAutomation_gwmphd"
+  "applicationId": "SecurityRequestAutomation_gwmphd_gwmphd"
 }

@@ -1,0 +1,244 @@
+{
+  "id": "approveMyTeamSkills",
+  "endPoints": [
+    {
+      "name": "personalInfo",
+      "baseUrlType": "WORKDAY",
+      "url": "/common/v1/workers/me",
+      "authType": "sso"
+    },
+    {
+      "name": "userLanguage",
+      "baseUrlType": "WORKDAY",
+      "authType": "sso",
+      "url": "/common/v1/userInfo"
+    },
+    {
+      "name": "custOrgInfo",
+      "url": "https://api.workday.com/customObject/v2/customObjects/ssconfiguration/<% environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID)) %>",
+      "authType": "sso"
+    },
+    {
+      "name": "teamSkills",
+      "baseUrlType": "WORKDAY",
+      "deferred": "true",
+      "url": "/raas/7000017312/WCP_SS_My_Team_Pending_Skills_SCK?Custom_Org_WID%21WID=<% approval %>&format=json",
+      "authType": "sso"
+    },
+    {
+      "name": "getCatalog",
+      "deferred": "true",
+      "url": "https://elastic.snaplogic.com:443/api/1/rest/slsched/feed/SonyDev/Production/Skill%20Survey/Skill_App_Catalogue_API%20Task%20-%20PROD?bearer_token=I8Y7Ae7eW8mbN9EO255QhtW3vSApIT2u&ReferenceID=<% id %>",
+      "authType": "NoAuth"
+    },
+    {
+      "name": "ratingModels",
+      "baseUrlType": "WORKDAY",
+      "url": "/raas/7000017312/WCP_SS_Rating_Model?workdayID=<% environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID)) %>&format=json",
+      "authType": "sso"
+    },
+    {
+      "name": "getManager",
+      "baseUrlType": "WORKDAY",
+      "authType": "sso",
+      "url": "/raas/7000017312/WCP_SS_Worker_Manager_SCK?Include_Subordinate_Organizations=1&Worker%21WID=<% personalInfo.id %>&Subfilter_Top_Custom_Org=<% environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID)) %>&format=json"
+    }
+  ],
+  "script": "<%
+   var flattenList = function(code) { //eso aplana la lista pues viene un worker y cada worker con sus varios skills
+    var res = []; //devuelve una lista
+    var cont = 0; //contador
+      for(var employee : pageVariables.teamSkills.Report_Entry){ //cogemos cada uno de los empleados
+        for(var skill : employee.Skills_group){ //cogemos sus skills
+          if(cont < 500){ //si la cuenta de las skills total es menor que 500
+            if(string:contains(skill.referenceID, code)){
+  if(skill.rating > 0) {
+             res.add(json:create( //voy creando elementos en la lista que sean objectos JSON
+             json:attribute('rating', skill.rating),
+             json:attribute('workdayID', skill.workdayID),
+             json:attribute('assessedOn', skill.assessedOn),
+             json:attribute('comment', empty(skill.comment) ? '' : skill.comment),
+             json:attribute('referenceID', skill.referenceID),
+             json:attribute('Worker', employee.Worker),
+             json:attribute('Employee_ID', employee.Employee_ID)));
+             cont = cont + 1;
+             }
+            }
+          }
+        }
+      }
+    return res;
+};
+
+             var filterCatalog = function(code) {
+             var res = '|';
+             var aux=[];
+             var cont = 0;
+             for(var employee : pageVariables.teamSkills.Report_Entry){
+             for(var skill : employee.Skills_group){
+             //maybe un if < 500
+             if (cont<500) {
+             if(string:contains(skill.referenceID, code) && !aux.contains(skill.referenceID)){
+             if(skill.rating > 0) {
+             res = string:concat(res, string:concat(skill.referenceID, '|'));
+             aux.add(skill.referenceID);
+             cont = cont + 1;
+  }
+             }
+             }
+             }
+             }
+             return string:urlEncode(res);
+             };
+
+  var pending = function(code) { //este es para hacer el submission y para el flow
+
+    var pendingSkills = false;
+    pendingSkills = flattenList(code).size() > approveSkills.selectedRows.size();
+    return pendingSkills;
+
+  };
+
+      var showInstanceListAfterSelectingRows = function() {
+      if(size(approveSkills.getRows()) > 100) {
+      if(size((approveSkills.getRows()).subList(0,100)) == size(approveSkills.getSelectedRows())){
+      dropdownListMassSendBackOrApprove.visible = true;
+  }
+  }
+      if(size(approveSkills.getRows()) == size(approveSkills.getSelectedRows())){
+      dropdownListMassSendBackOrApprove.visible = true;
+  }
+  };
+
+
+      var populateInstanceList = function(id) {
+
+      var listOfIds = [];
+          if(!empty id){
+      listOfIds.add(id[0]);
+  }
+
+      var currRowSelected = false;
+          var defaultStringSendBack = 'Sent back on mass action by manager';
+
+      for(var row : approveSkills.selectedRows){
+      row.childrenMap.v812.setValue(listOfIds);
+      if(!empty(row.childrenMap.v812.value) && row.childrenMap.v812.value[0] == 'Sent back to employee'){
+      row.childrenMap.v813.enabled = true;
+      row.childrenMap.v813.required = true;
+      row.childrenMap.v813.value = defaultStringSendBack;
+  } else {
+      row.childrenMap.v813.enabled = true;
+      row.childrenMap.v813.required = false;
+      row.childrenMap.v813.value = ' ';
+  }
+  }
+  };
+%>",
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "name": "actionSkill",
+        "baseUrlType": "WORKDAY",
+        "url": "/customObject/v2/customObjects/skills/<% workerSkillId.value %>",
+        "authType": "sso",
+        "httpMethod": "PUT",
+        "headers": [
+          {
+            "name": "content-type",
+            "value": "application/json"
+          }
+        ],
+        "onSend": "<%
+                    var currRowSelected = false;
+
+                        for (var row : approveSkills.selectedRows) {
+                          if (row.childrenMap.employeeInfo.childrenMap.rowIndex.value == rowIndex.value) {
+                              currRowSelected = true;
+                              break;
+                            }
+                        }
+
+                  currRowSelected ? self.data : null;
+          %>"
+      },
+      {
+        "name": "flowApproveSkill",
+        "type": "outboundVariable",
+        "variableScope": "flow",
+        "values": [
+          {
+            "outboundPath": "pending",
+            "value": "<% pending(custOrgInfo.catalogCode) %>"
+          }
+        ]
+      }
+    ]
+  },
+  "onLoad": "<%
+             pageVariables.teamSkills = teamSkills.invoke({'approval': (environment == 'IMPL' ? site.appProperties.IMPL_ID : (environment == 'PROD' ? site.appProperties.PROD_ID : (environment == 'SANDBOX' ? site.appProperties.SBX_ID : site.appProperties.GMS_ID))) + '&Sup_Org_Manager%21WID=' + personalInfo.id });
+             pageVariables.getCatalog = getCatalog.invoke({'id': filterCatalog(custOrgInfo.catalogCode)});
+   %>",
+  "presentation": {
+    "headerSize": "STANDARD",
+    "title": {
+      "type": "title",
+      "label": "<% presentationLabels.yourTeamSkillRequests %>"
+    },
+    "preferredLabelPosition": "aside",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "fieldSet",
+          "id": "fieldSet1",
+          "children": [
+            {
+              "type": "instanceList",
+              "label": "Select one of the options when submitting all skills:",
+              "id": "dropdownListMassSendBackOrApprove",
+              "selectedValues": "<% list:toList('Completed') %>",
+              "visible": false,
+              "instanceList": [
+                {
+                  "id": "Completed",
+                  "descriptor": "<% string:split(userLanguage.data[0].language, '_')[0]=='ja' ? '承認' : 'Approve' %>"
+                },
+                {
+                  "id": "Sent back to employee",
+                  "descriptor": "<% string:split(userLanguage.data[0].language, '_')[0]=='ja' ? '差戻し' : 'Send Back to Employee' %>"
+                }
+              ],
+              "onChange": "<% populateInstanceList(self.value) %>"
+            }
+          ]
+        },
+        {
+          "type": "editButtonBar",
+          "editButtons": [
+            {
+              "type": "editButton",
+              "label": "<% presentationLabels.submit %>",
+              "id": "submit",
+              "buttonType": "PRIMARY"
+            }
+          ]
+        },
+        {
+          "type": "pod",
+          "podId": "approveMyTeamSkillsPod2"
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "pod",
+          "podId": "footer"
+        }
+      ]
+    }
+  }
+}

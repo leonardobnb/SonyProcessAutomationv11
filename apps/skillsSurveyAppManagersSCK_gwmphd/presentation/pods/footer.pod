@@ -1,0 +1,10 @@
+{
+  "podId": "footer",
+  "seed": {
+    "template": {
+      "type": "richText",
+      "enabled": "false",
+      "value": "<b>Skills App V3.0</b>"
+    }
+  }
+}

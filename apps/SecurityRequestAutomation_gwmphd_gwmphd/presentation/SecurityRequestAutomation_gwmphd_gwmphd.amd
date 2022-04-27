@@ -44,7 +44,7 @@
         {
           "id": "selfPop",
           "endsFlow": true,
-          "taskId": "securityRequestConfirm"
+          "taskId": "CreateSecurityRequest"
         }
       ]
     }
@@ -91,30 +91,9 @@
       "page": {
         "id": "securityRequestEventAction"
       }
-    },
-    {
-      "id": "securityRequestConfirm",
-      "routingPattern": "securityRequestConfirm",
-      "page": {
-        "id": "securityRequestConfirm"
-      }
-    },
-    {
-      "id": "ViewSecurityRequestFromRelatedActions",
-      "routingPattern": "ViewSecurityRequestFromRelatedActions",
-      "page": {
-        "id": "ViewSecurityRequestFromRelatedActions"
-      }
-    },
-    {
-      "id": "ViewSecurityRequestFromRelatedActionsWithID",
-      "routingPattern": "ViewSecurityRequestFromRelatedActions/{taskObjectId}",
-      "page": {
-        "id": "ViewSecurityRequestFromRelatedActions"
-      }
     }
   ],
-  "applicationId": "SecurityRequestAutomation_gwmphd",
+  "applicationId": "SecurityRequestAutomation_gwmphd_gwmphd",
   "dataProviders": [
     {
       "key": "app",

@@ -1,19 +1,17 @@
 {
-  "id": "ViewSecurityRequest",
+  "id": "ViewSecurityRequestFromRelatedActions",
   "endPoints": [
     {
       "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
       "name": "getTById",
-      "baseUrlType": "app",
-      "url": "<% 'sRTargets' + '/' + flowVariables.targetToShow %>",
-      "authType": "sso",
-      "deferred": false
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20toWorker%2C%20toPosition%2C%20referenceToSecurityRequest%2C%20createdMoment%20FROM%20SecurityRequestAutomation_gwmphd_sRTargets%20WHERE%20referenceToSecurityRequest%20%3D%20%22' + queryParams.taskObjectId + '%22' %>",
+      "authType": "sso"
     },
     {
       "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
       "name": "getSRById",
       "baseUrlType": "app",
-      "url": "<% 'securityRequests' + '/' + getTById.referenceToSecurityRequest.id %>",
+      "url": "<% 'securityRequests' + '/' + getTById.data[0].referenceToSecurityRequest.id %>",
       "authType": "sso"
     },
     {
@@ -24,9 +22,6 @@
       "deferred": true
     }
   ],
-  "outboundData": {
-    "outboundEndPoints": [ ]
-  },
   "script": "<%
              //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
              var businessProcessEventPopulate = function() {
@@ -39,10 +34,9 @@
              %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
-    "pageType": "view",
     "title": {
       "type": "title",
-      "label": "View Security Requests"
+      "label": "View Security Request"
     },
     "body": {
       "type": "section",
@@ -84,9 +78,9 @@
           "enabled": "false",
           "instanceList": [
             {
-              "id": "<% getTById.toWorker.id %>",
-              "descriptor": "<% getTById.toWorker.descriptor %>",
-              "wid": "<% getTById.toWorker.id %>"
+              "id": "<% getTById.data[0].toWorker.id %>",
+              "descriptor": "<% getTById.data[0].toWorker.descriptor %>",
+              "wid": "<% getTById.data[0].toWorker.id %>"
             }
           ]
         },
@@ -98,9 +92,9 @@
           "enabled": "false",
           "instanceList": [
             {
-              "id": "<% getTById.toPositon.id %>",
-              "descriptor": "<% getTById.toPosition.descriptor %>",
-              "wid": "<% getTById.toPosition.id %>"
+              "id": "<% getTById.data[0].toPositon.id %>",
+              "descriptor": "<% getTById.data[0].toPosition.descriptor %>",
+              "wid": "<% getTById.data[0].toPosition.id %>"
             }
           ]
         },
@@ -112,7 +106,7 @@
           "label": "Creation date",
           "dateFormat": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
           "dateDisplayPattern": "yyyy-MM-dd HH:mm:ss ",
-          "value": "<% flowVariables.createdMomentRequest%>",
+          "value": "<% getTById.data[0].createdMoment %>",
           "enabled": "false"
         },
         {
@@ -145,9 +139,5 @@
         }
       ]
     }
-  },
-  "footer": {
-    "type": "footer",
-    "children": [ ]
   }
 }
