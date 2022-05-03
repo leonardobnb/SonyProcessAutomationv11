@@ -1,0 +1,146 @@
+{
+  "id": "securityRequestConfirm",
+  "endPoints": [
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequests' + '/' + flowVariables.securityRequestID %>",
+      "authType": "sso"
+    },
+    {
+      "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
+      "name": "getTById",
+      "baseUrlType": "app",
+      "url": "<% 'sRTargets' + '/' + flowVariables.sRTargetID %>",
+      "authType": "sso"
+    },
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getBPEvents",
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20businessProcesses%7BactionEvent%2C%20transactionStatus%7D%20FROM%20SecurityRequestAutomation_gwmphd_securityRequests%20WHERE%20workdayID%3D%22'+ id +'%22' %>",
+      "authType": "sso",
+      "deferred": true
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [ ]
+  },
+  "script": "<%
+             //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
+             var businessProcessEventPopulate = function() {
+                 var events = [];
+                 for (var item : getBPEvents.invoke({'id': getSRById.id}).data[0].businessProcesses){
+                     events.add({'id':item.actionEvent.id, 'descriptor':item.actionEvent.descriptor + ' (' + item.transactionStatus.descriptor + ')', 'wid':item.actionEvent.id});
+                 }
+                 return events;
+             }
+             %>",
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "confirm",
+    "title": {
+      "type": "title",
+      "label": "Create Security Request",
+      "enabled": false
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "congratulationsPopup",
+          "id": "congratsPopUp",
+          "textCongrats": "Submission completed!",
+          "textSubmitted": "",
+          "render": "<% true %>",
+          "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
+        },
+        {
+          "_comment": "Se rellena con el dato from worker del security request",
+          "type": "instanceList",
+          "label": "From worker",
+          "id": "fromWorkerText",
+          "enabled": "false",
+          "instanceList": [
+            {
+              "id": "<% getSRById.fromWorker.id %>",
+              "descriptor": "<% getSRById.fromWorker.descriptor %>",
+              "wid": "<% getSRById.fromWorker.id %>"
+            }
+          ]
+        },
+        {
+          "_comment": "Se rellena con el dato from position del security request",
+          "type": "instanceList",
+          "id": "fromPositionText",
+          "label": "From Position",
+          "enabled": "false",
+          "instanceList": [
+            {
+              "id": "<% getSRById.fromPosition.id %>",
+              "descriptor": "<% getSRById.fromPosition.descriptor %>",
+              "wid": "<% getSRById.fromPosition.id %>"
+            }
+          ]
+        },
+        {
+          "_comment": "Se rellena con el dato to worker del security request",
+          "type": "instanceList",
+          "label": "To worker",
+          "id": "toWorkerText",
+          "enabled": "false",
+          "instanceList": [
+            {
+              "id": "<% getTById.toWorker.id %>",
+              "descriptor": "<% getTById.toWorker.descriptor %>",
+              "wid": "<% getTById.toWorker.id %>"
+            }
+          ]
+        },
+        {
+          "_comment": "Se rellena con el dato to position del security request",
+          "type": "instanceList",
+          "label": "To position",
+          "id": "toPositionText",
+          "enabled": "false",
+          "instanceList": [
+            {
+              "id": "<% getTById.toPositon.id %>",
+              "descriptor": "<% getTById.toPosition.descriptor %>",
+              "wid": "<% getTById.toPosition.id %>"
+            }
+          ]
+        },
+        {
+          "_comment": "Se rellena con el dato  effective date del security request",
+          "type": "date",
+          "id": "effectiveDateText",
+          "datePrecision": "DAY",
+          "label": "Effective date",
+          "dateDisplayPattern": "yyyy-MM-dd",
+          "value": "<%getSRById.effectiveDate%>",
+          "enabled": "false"
+        },
+        {
+          "_comment": "Se rellena con el dato justification text del security request",
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "enabled": "false",
+          "value": "<% getSRById.justificationText %>"
+        },
+        {
+          "_comment": "We show the business process event instance linked to the Security Request",
+          "type": "instanceList",
+          "label": "Event",
+          "id": "businessProcessEvent",
+          "enabled": "false",
+          "values": "<%
+                     businessProcessEventPopulate();
+                     %>"
+        }
+      ]
+    }
+  }
+}

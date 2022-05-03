@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "name": "ViewSecurityRequest",
+  "label": "View Security Request",
+  "secured": true,
+  "businessObject": "SecurityRequest",
+  "routePath": "ViewSecurityRequestFromRelatedActions/{taskObjectId}",
+  "securityDomains": [
+    "CreateSecurityRequest"
+  ]
+}

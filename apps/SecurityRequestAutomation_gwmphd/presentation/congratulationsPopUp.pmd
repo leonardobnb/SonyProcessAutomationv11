@@ -1,0 +1,35 @@
+{
+  "id": "congratulationsPopUp",
+  "endPoints": [
+  ],
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "title": {
+      "type": "title",
+      "label": "Workday Extend"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "type": "congratulationsPopup",
+          "id": "congratsPopUp",
+          "textCongrats": "Submission completed!",
+          "textSubmitted": "",
+          "_comment": "popup que informa de que el submit de la security request ha sido exitosa. Solo se muestra tras el submit"
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By Workday Extend"
+        }
+      ]
+    }
+  }
+}
