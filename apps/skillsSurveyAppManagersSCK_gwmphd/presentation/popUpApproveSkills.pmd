@@ -1,0 +1,80 @@
+{
+  "id": "popUpApproveSkills",
+  "endPoints": [ ],
+  "outboundData": {
+    "outboundEndPoints": [
+      {
+        "type": "outboundVariable",
+        "name": "dummy",
+        "values": [ ]
+      }
+    ]
+  },
+  "presentation": {
+    "headerSize": "HIDDEN",
+    "standardEditButtonsHidden": "true",
+    "micro": "true",
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "sorted": false,
+      "children": [
+        {
+          "type": "section",
+          "horizontal": "true",
+          "children": [
+            {
+              "type": "richText",
+              "enabled": "false",
+              "value": "${flowVariables.pending ? '<h2><b>${presentationLabels.partiallyCompleted}</b></h2>' : '<h2><b>Completed</b></h2>'}"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "render": "${flowVariables.pending}",
+          "enabled": "false",
+          "value": "${presentationLabels.aware}"
+        },
+        {
+          "type": "section",
+          "horizontal": "true",
+          "children": [
+            {
+              "type": "button",
+              "label": "${presentationLabels.done}",
+              "taskReference": {
+                "type": "taskReference",
+                "taskId": "root"
+              },
+              "action": "AUXILIARY",
+              "commandHttpMethod": "GET"
+            },
+            {
+              "type": "button",
+              "render": "${flowVariables.pending}",
+              "label": "${presentationLabels.goToApprovePendingSkills}",
+              "taskReference": {
+                "type": "taskReference",
+                "taskId": "approveMyTeamSkills"
+              },
+              "action": "PRIMARY",
+              "commandHttpMethod": "GET"
+            }
+          ]
+        }
+      ]
+    },
+    "footer": {
+      "type": "footer",
+      "visible": "false",
+      "children": [
+        {
+          "type": "richText",
+          "enabled": "false",
+          "value": "Powered By WCP"
+        }
+      ]
+    }
+  }
+}

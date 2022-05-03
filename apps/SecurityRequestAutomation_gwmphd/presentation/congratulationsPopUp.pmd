@@ -1,7 +1,6 @@
 {
   "id": "congratulationsPopUp",
-  "endPoints": [
-  ],
+  "endPoints": [ ],
   "presentation": {
     "headerSize": "VPS_DEFAULT",
     "title": {

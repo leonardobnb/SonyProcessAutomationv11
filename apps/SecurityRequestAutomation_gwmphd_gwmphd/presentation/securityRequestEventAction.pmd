@@ -1,5 +1,5 @@
 {
-  "id": "viewSecurityRequestEvent",
+  "id": "securityRequestEventAction",
   "endPoints": [
     {
       "name": "createSecurityRequestEvents",
@@ -85,20 +85,19 @@
           "type": "date",
           "id": "effectiveDate",
           "label": "Effective Date",
-          "dateDisplayPattern": "yyyy-MM-dd",
           "value": "<% securityRequest.effectiveDate %>"
+        },
+        {
+          "type": "date",
+          "id": "effectiveUntil",
+          "label": "Effective Until",
+          "value": "<% securityRequest.effectiveUntil %>"
         },
         {
           "type": "text",
           "id": "justificationText",
           "label": "Justification Text",
           "value": "<% securityRequest.justificationText %>"
-        },
-        {
-          "type": "text",
-          "id": "eventStatus",
-          "label": "Event Status",
-          "value": "<% securityRequest.cf_ZCFEventStatus %>"
         },
         {
           "type": "hidden",

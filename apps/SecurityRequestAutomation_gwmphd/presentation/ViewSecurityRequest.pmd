@@ -2,35 +2,41 @@
   "id": "ViewSecurityRequest",
   "endPoints": [
     {
-      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
-      "name": "getSRById",
-      "baseUrlType": "app",
-      "url": "<% 'securityRequests' + '/' + id %>",
-      "authType": "sso",
-      "deferred": true
-    },
-    {
       "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
       "name": "getTById",
       "baseUrlType": "app",
-      "url": "<% 'sRTargets' + '/' + id %>",
+      "url": "<% 'sRTargets' + '/' + flowVariables.targetToShow %>",
       "authType": "sso",
-      "deferred": true
+      "deferred": false
     },
     {
-      "_comment": "Endpoint que devuelve el Pending Status cuyo id coincide con el de la url",
-      "name": "getStatusById",
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
       "baseUrlType": "app",
-      "url": "<% 'processingStatuses' + '/' + id %>",
+      "url": "<% 'securityRequests' + '/' + getTById.referenceToSecurityRequest.id %>",
+      "authType": "sso"
+    },
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getBPEvents",
+      "url": "<% 'https://api.workday.com/wql/v1/data?query=SELECT%20businessProcesses%7BactionEvent%2C%20transactionStatus%7D%20FROM%20SecurityRequestAutomation_gwmphd_securityRequests%20WHERE%20workdayID%3D%22'+ id +'%22' %>",
       "authType": "sso",
       "deferred": true
     }
-
   ],
   "outboundData": {
-    "outboundEndPoints": [
-    ]
+    "outboundEndPoints": [ ]
   },
+  "script": "<%
+             //Función que devuelve una lista que almacena en primer lugar el id del target, y en segundo lugar un descriptor con datos de los trabajores implicados y la fecha
+             var businessProcessEventPopulate = function() {
+                 var events = [];
+                 for (var item : getBPEvents.invoke({'id': getSRById.id}).data[0].businessProcesses){
+                     events.add({'id':item.actionEvent.id, 'descriptor':item.actionEvent.descriptor + ' (' + item.transactionStatus.descriptor + ')', 'wid':item.actionEvent.id});
+                 }
+                 return events;
+             }
+             %>",
   "presentation": {
     "headerSize": "VPS_DEFAULT",
     "pageType": "view",
@@ -44,70 +50,70 @@
       "children": [
         {
           "_comment": "Se rellena con el dato from worker del security request",
-          "type": "text",
+          "type": "instanceList",
           "label": "From worker",
           "id": "fromWorkerText",
           "enabled": "false",
-          "value": "<% //Se coje el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return SRequest.fromWorker.descriptor;
-
-                    }
-                        else {
-                        return '';
-
-                    } %>"
+          "instanceList": [
+            {
+              "id": "<% getSRById.fromWorker.id %>",
+              "descriptor": "<% getSRById.fromWorker.descriptor %>",
+              "wid": "<% getSRById.fromWorker.id %>"
+            }
+          ]
         },
-
         {
           "_comment": "Se rellena con el dato from position del security request",
-          "type": "text",
+          "type": "instanceList",
           "id": "fromPositionText",
           "label": "From Position",
           "enabled": "false",
-          "value": "<% //Se devuelve el valor de fromPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return SRequest.fromPosition.descriptor;
-                    }
-                        else {
-                        return '';
-                    } %>"
+          "instanceList": [
+            {
+              "id": "<% getSRById.fromPosition.id %>",
+              "descriptor": "<% getSRById.fromPosition.descriptor %>",
+              "wid": "<% getSRById.fromPosition.id %>"
+            }
+          ]
         },
         {
           "_comment": "Se rellena con el dato to worker del security request",
-          "type": "text",
+          "type": "instanceList",
           "label": "To worker",
           "id": "toWorkerText",
           "enabled": "false",
-          "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return TRequest.toWorker.descriptor;
-                    }
-                        else {
-                        return '';
-                    } %>"
+          "instanceList": [
+            {
+              "id": "<% getTById.toWorker.id %>",
+              "descriptor": "<% getTById.toWorker.descriptor %>",
+              "wid": "<% getTById.toWorker.id %>"
+            }
+          ]
         },
         {
           "_comment": "Se rellena con el dato to position del security request",
-          "type": "text",
+          "type": "instanceList",
           "label": "To position",
           "id": "toPositionText",
           "enabled": "false",
-          "value": "<%//Se devuelve el valor de toPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return TRequest.toPosition.descriptor;
-                    }
-                        else {
-                        return '';
-                    } %>"
+          "instanceList": [
+            {
+              "id": "<% getTById.toPositon.id %>",
+              "descriptor": "<% getTById.toPosition.descriptor %>",
+              "wid": "<% getTById.toPosition.id %>"
+            }
+          ]
+        },
+        {
+          "_comment": "Se rellena con el dato  creation Moment del security request",
+          "type": "date",
+          "id": "creationDateText",
+          "datePrecision": "DAY",
+          "label": "Creation date",
+          "dateFormat": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+          "dateDisplayPattern": "yyyy-MM-dd HH:mm:ss ",
+          "value": "<% flowVariables.createdMomentRequest%>",
+          "enabled": "false"
         },
         {
           "_comment": "Se rellena con el dato  effective date del security request",
@@ -115,37 +121,9 @@
           "id": "effectiveDateText",
           "datePrecision": "DAY",
           "label": "Effective date",
-          "dateFormat": "yyyy-MM-dd",
-          "value": "<% //Se devuelve el valor de effective date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return SRequest.effectiveDate;
-
-                    }
-                        else {
-                        return '';
-                    } %>",
+          "dateDisplayPattern": "yyyy-MM-dd",
+          "value": "<%getSRById.effectiveDate%>",
           "enabled": "false"
-        },
-
-        {
-          "_comment": "Se rellena con el dato effective until del security request",
-          "type": "date",
-          "id": "effectiveUntilText",
-          "label": "Effective Until",
-          "datePrecision": "DAY",
-          "enabled": "false",
-          "dateFormat": "yyyy-MM-dd",
-          "value": "<%//Se devuelve el valor de effective until date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return (SRequest.effectiveUntil);
-                    }
-                        else {
-                        return '';
-                    } %>"
         },
         {
           "_comment": "Se rellena con el dato justification text del security request",
@@ -153,39 +131,23 @@
           "id": "justificationText",
           "label": "Justification Text",
           "enabled": "false",
-          "value": "<% //Se devuelve el valor del justification text del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                    if( !(empty flowVariables.targetToShow)) {
-                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                            return SRequest.justificationText;
-                    }
-                        else {
-                        return '';
-                    }%>"
-        },{
-           "_comment": "Se rellena con el dato Processing Status del security request",
-           "type": "text",
-           "label": "Processing Status",
-           "id": "statusText",
-           "enabled": "false",
-           "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
-                     if( !(empty flowVariables.targetToShow)) {
-                         var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
-                             var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
-                             var Status = getStatusById.invoke({'id': SRequest.processingStatus.id});
-                             return Status.status;
-                     }
-                         else {
-                         return '';
-                     } %>"
-         }
+          "value": "<% getSRById.justificationText %>"
+        },
+        {
+          "_comment": "We show the business process event instance linked to the Security Request",
+          "type": "instanceList",
+          "label": "Event",
+          "id": "businessProcessEvent",
+          "enabled": "false",
+          "values": "<%
+                     businessProcessEventPopulate();
+                     %>"
+        }
       ]
     }
   },
   "footer": {
     "type": "footer",
-    "children": [
-
-    ]
+    "children": [ ]
   }
 }

@@ -1,0 +1,186 @@
+{
+  "id": "ViewSecurityRequest",
+  "endPoints": [
+    {
+      "_comment": "Endpoint que devuelve el security request cuyo id coincide con el de la url",
+      "name": "getSRById",
+      "baseUrlType": "app",
+      "url": "<% 'securityRequests' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    },
+    {
+      "_comment": "Endpoint que devuelve el Security Request Target cuyo id coincide con el de la url",
+      "name": "getTById",
+      "baseUrlType": "app",
+      "url": "<% 'sRTargets' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    },
+    {
+      "_comment": "Endpoint que devuelve el Pending Status cuyo id coincide con el de la url",
+      "name": "getStatusById",
+      "baseUrlType": "app",
+      "url": "<% 'processingStatuses' + '/' + id %>",
+      "authType": "sso",
+      "deferred": true
+    }
+  ],
+  "outboundData": {
+    "outboundEndPoints": [ ]
+  },
+  "presentation": {
+    "headerSize": "VPS_DEFAULT",
+    "pageType": "view",
+    "title": {
+      "type": "title",
+      "label": "View Security Requests"
+    },
+    "body": {
+      "type": "section",
+      "horizontal": false,
+      "children": [
+        {
+          "_comment": "Se rellena con el dato from worker del security request",
+          "type": "text",
+          "label": "From worker",
+          "id": "fromWorkerText",
+          "enabled": "false",
+          "value": "<% //Se coje el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return SRequest.fromWorker.descriptor;
+
+                    }
+                        else {
+                        return '';
+
+                    } %>"
+        },
+        {
+          "_comment": "Se rellena con el dato from position del security request",
+          "type": "text",
+          "id": "fromPositionText",
+          "label": "From Position",
+          "enabled": "false",
+          "value": "<% //Se devuelve el valor de fromPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return SRequest.fromPosition.descriptor;
+                    }
+                        else {
+                        return '';
+                    } %>"
+        },
+        {
+          "_comment": "Se rellena con el dato to worker del security request",
+          "type": "text",
+          "label": "To worker",
+          "id": "toWorkerText",
+          "enabled": "false",
+          "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return TRequest.toWorker.descriptor;
+                    }
+                        else {
+                        return '';
+                    } %>"
+        },
+        {
+          "_comment": "Se rellena con el dato to position del security request",
+          "type": "text",
+          "label": "To position",
+          "id": "toPositionText",
+          "enabled": "false",
+          "value": "<%//Se devuelve el valor de toPosition del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return TRequest.toPosition.descriptor;
+                    }
+                        else {
+                        return '';
+                    } %>"
+        },
+        {
+          "_comment": "Se rellena con el dato  effective date del security request",
+          "type": "date",
+          "id": "effectiveDateText",
+          "datePrecision": "DAY",
+          "label": "Effective date",
+          "dateFormat": "yyyy-MM-dd",
+          "value": "<% //Se devuelve el valor de effective date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return SRequest.effectiveDate;
+
+                    }
+                        else {
+                        return '';
+                    } %>",
+          "enabled": "false"
+        },
+        {
+          "_comment": "Se rellena con el dato effective until del security request",
+          "type": "date",
+          "id": "effectiveUntilText",
+          "label": "Effective Until",
+          "datePrecision": "DAY",
+          "enabled": "false",
+          "dateFormat": "yyyy-MM-dd",
+          "value": "<%//Se devuelve el valor de effective until date del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return (SRequest.effectiveUntil);
+                    }
+                        else {
+                        return '';
+                    } %>"
+        },
+        {
+          "_comment": "Se rellena con el dato justification text del security request",
+          "type": "text",
+          "id": "justificationText",
+          "label": "Justification Text",
+          "enabled": "false",
+          "value": "<% //Se devuelve el valor del justification text del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                    if( !(empty flowVariables.targetToShow)) {
+                        var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                            var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                            return SRequest.justificationText;
+                    }
+                        else {
+                        return '';
+                    }%>"
+        },
+        {
+          "_comment": "Se rellena con el dato Processing Status del security request",
+          "type": "text",
+          "label": "Processing Status",
+          "id": "statusText",
+          "enabled": "false",
+          "value": "<% //Se devuelve el valor de fromWorker del security request elegido en la página micro anterior, cuyos datos viajan mediante una variable flow
+                     if( !(empty flowVariables.targetToShow)) {
+                         var TRequest = getTById.invoke({'id': flowVariables.targetToShow});
+                             var SRequest = getSRById.invoke({'id': TRequest.referenceToSecurityRequest.id});
+                             var Status = getStatusById.invoke({'id': SRequest.processingStatus.id});
+                             return Status.status;
+                     }
+                         else {
+                         return '';
+                     } %>"
+        }
+      ]
+    }
+  },
+  "footer": {
+    "type": "footer",
+    "children": [ ]
+  }
+}
