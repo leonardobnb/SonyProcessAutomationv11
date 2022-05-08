@@ -2,7 +2,6 @@
   "id" : "d9c59a7eb05be9f0edcba53c2b67d282",
   "referenceId" : "SecurityRequestAutomation_gwmphd",
   "name" : "SecurityRequestAutomation",
-  "latestVersion" : "6f068d8c5a47d9da0d7d6171b458b45f",
-  "organizationId" : "b1a1b970-80c4-46f6-858c-fd684fef1eea",
-  "promotionLevel" : "RELEASE_CANDIDATE"
+  "latestVersion" : "c12adf3965f8d8425eefc233eb503fc3",
+  "organizationId" : "b1a1b970-80c4-46f6-858c-fd684fef1eea"
 }
